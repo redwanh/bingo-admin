@@ -11,7 +11,7 @@ import Dashboard from './pages/Dashboard';
 import Users from './pages/Users/index';
 import GameConfig from './pages/GameConfig';
 import VoiceManager from './pages/VoiceManager';
-import GameMonitor from './pages/GameMonitor';
+import GameMonitor from './pages/MainBingoMonitor';
 import MainBingoRules from './pages/MainBingoRules';
 import MainBingoMonitor from './pages/MainBingoMonitor';
 import Transactions from './pages/Transactions/index';

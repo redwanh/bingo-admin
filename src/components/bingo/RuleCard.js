@@ -4,28 +4,25 @@ export default function RuleCard({ rule, onEdit, onTest, onSamples, onDelete }) 
   const cfg = rule.ruleConfig || {};
   
   return (
-    <div style={{ background: '#16213e', padding: 24, borderRadius: 16, border: '1px solid #1a1a3e' }}>
+    <div style={styles.card}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 12 }}>
-        <h3 style={{ margin: 0, fontSize: 18 }}>{rule.name}</h3>
-        <span style={{ 
-          fontSize: 10, padding: '4px 10px', borderRadius: 20, 
-          background: rule.method === 'rule' ? '#2ED573' : '#FFA502', 
-          color: '#000', fontWeight: 700, textTransform: 'uppercase'
+      <div style={styles.header}>
+        <h3 style={styles.name}>{rule.name}</h3>
+        <span style={{
+          ...styles.methodBadge,
+          background: rule.method === 'rule' ? '#d1fae5' : '#fef3c7',
+          color: rule.method === 'rule' ? '#065f46' : '#b8962f'
         }}>
           {rule.method}
         </span>
       </div>
       
       {rule.description && (
-        <p style={{ color: '#888', fontSize: 13, marginBottom: 12 }}>{rule.description}</p>
+        <p style={styles.description}>{rule.description}</p>
       )}
       
       {/* Config Summary */}
-      <div style={{ 
-        fontSize: 11, color: '#aaa', display: 'flex', flexWrap: 'wrap', gap: 6, 
-        marginBottom: 12, background: '#0a0a1e', padding: 10, borderRadius: 8 
-      }}>
+      <div style={styles.tagsContainer}>
         <Tag label="🎯 Lines" value={cfg.linesToWin || 1} />
         <Tag label="↔️ Rows" value={`${cfg.minRows || 0}${cfg.exactRows ? `(=${cfg.exactRows})` : ''}`} />
         <Tag label="↕️ Cols" value={`${cfg.minColumns || 0}${cfg.exactColumns ? `(=${cfg.exactColumns})` : ''}`} />
@@ -39,26 +36,22 @@ export default function RuleCard({ rule, onEdit, onTest, onSamples, onDelete }) 
 
       {/* Sample Count */}
       {(rule.samples?.wins?.length > 0 || rule.samples?.losses?.length > 0) && (
-        <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+        <div style={styles.sampleContainer}>
           {rule.samples?.wins?.length > 0 && (
-            <span style={sampleBadge('#2ED573', '#1a3a2a')}>
-              🏆 {rule.samples.wins.length}
-            </span>
+            <span style={styles.winBadge}>🏆 {rule.samples.wins.length}</span>
           )}
           {rule.samples?.losses?.length > 0 && (
-            <span style={sampleBadge('#FF4757', '#3a1a1a')}>
-              ❌ {rule.samples.losses.length}
-            </span>
+            <span style={styles.lossBadge}>❌ {rule.samples.losses.length}</span>
           )}
         </div>
       )}
 
       {/* Actions */}
-      <div style={{ display: 'flex', gap: 8 }}>
-        <ActionButton label="✎ Edit" color="#0f3460" onClick={onEdit} />
-        <ActionButton label="🧪 Test" color="#FFA502" textColor="#000" onClick={onTest} />
-        <ActionButton label="📊 Samples" color="#7C5CFC" onClick={onSamples} />
-        <ActionButton label="🗑" color="#3a0a0a" textColor="#FF4757" onClick={onDelete} narrow />
+      <div style={styles.actions}>
+        <button style={{ ...styles.actionBtn, background: '#f3f4f6', color: '#1a1a2e', border: '1px solid #e5e7eb' }} onClick={onEdit}>✎ Edit</button>
+        <button style={{ ...styles.actionBtn, background: '#fef3c7', color: '#b8962f', border: '1px solid #d4af37' }} onClick={onTest}>🧪 Test</button>
+        <button style={{ ...styles.actionBtn, background: '#ede9fe', color: '#6d28d9', border: '1px solid #7c5cfc' }} onClick={onSamples}>📊 Samples</button>
+        <button style={{ ...styles.actionBtn, background: '#fee2e2', color: '#991b1b', border: '1px solid #ef4444' }} onClick={onDelete}>🗑</button>
       </div>
     </div>
   );
@@ -66,26 +59,98 @@ export default function RuleCard({ rule, onEdit, onTest, onSamples, onDelete }) 
 
 function Tag({ label, value }) {
   return (
-    <span style={{ background: '#1a1a3e', padding: '3px 8px', borderRadius: 4 }}>
+    <span style={styles.tag}>
       {label}: {value}
     </span>
   );
 }
 
-function ActionButton({ label, color, textColor = '#fff', onClick, narrow }) {
-  return (
-    <button onClick={onClick} style={{ 
-      flex: narrow ? 'none' : 1, 
-      padding: narrow ? '10px 12px' : 10, 
-      borderRadius: 8, border: 'none', background: color, 
-      color: textColor, cursor: 'pointer', fontSize: 13, fontWeight: 600,
-      minWidth: narrow ? 44 : 'auto'
-    }}>
-      {label}
-    </button>
-  );
-}
-
-function sampleBadge(color, bg) {
-  return { fontSize: 11, color, background: bg, padding: '4px 10px', borderRadius: 12 };
-}
+const styles = {
+  card: {
+    background: '#ffffff',
+    padding: '24px',
+    borderRadius: '14px',
+    border: '2px solid #000000',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'start',
+    marginBottom: '12px',
+  },
+  name: {
+    margin: 0,
+    fontSize: '18px',
+    fontWeight: 700,
+    color: '#1a1a2e',
+  },
+  methodBadge: {
+    fontSize: '10px',
+    padding: '4px 10px',
+    borderRadius: '20px',
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    border: '1px solid #000000',
+  },
+  description: {
+    color: '#6b7280',
+    fontSize: '13px',
+    marginBottom: '12px',
+  },
+  tagsContainer: {
+    fontSize: '11px',
+    color: '#1a1a2e',
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '6px',
+    marginBottom: '12px',
+    background: '#f9fafb',
+    padding: '10px',
+    borderRadius: '8px',
+    border: '1px solid #e5e7eb',
+  },
+  tag: {
+    background: '#ffffff',
+    padding: '3px 8px',
+    borderRadius: '4px',
+    border: '1px solid #e5e7eb',
+  },
+  sampleContainer: {
+    display: 'flex',
+    gap: '8px',
+    marginBottom: '12px',
+  },
+  winBadge: {
+    fontSize: '11px',
+    color: '#065f46',
+    background: '#d1fae5',
+    padding: '4px 10px',
+    borderRadius: '12px',
+    border: '1px solid #065f46',
+  },
+  lossBadge: {
+    fontSize: '11px',
+    color: '#991b1b',
+    background: '#fee2e2',
+    padding: '4px 10px',
+    borderRadius: '12px',
+    border: '1px solid #991b1b',
+  },
+  actions: {
+    display: 'flex',
+    gap: '8px',
+  },
+  actionBtn: {
+    flex: 1,
+    padding: '10px',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '13px',
+    fontWeight: 600,
+    background: '#f9fafb',
+    color: '#1a1a2e',
+    border: '1px solid #e5e7eb',
+    transition: 'all 0.2s ease',
+  },
+};

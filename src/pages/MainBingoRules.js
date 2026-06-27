@@ -127,7 +127,6 @@ export default function MainBingoRulesPage() {
         { headers: headers() }
       );
       toast.success('Sample deleted!');
-      // Refresh samples
       const res = await axios.get(API + '/main-bingo-rules/' + viewRule._id + '/samples', { headers: headers() });
       setSamples(res.data.samples || { wins: [], losses: [] });
     } catch { toast.error('Failed to delete'); }
@@ -198,47 +197,39 @@ export default function MainBingoRulesPage() {
   };
 
   if (loading) return (
-    <div style={{ textAlign: 'center', padding: 50 }}>
-      <div style={{ fontSize: 24, marginBottom: 10 }}>🎯</div>
-      <p style={{ color: '#888' }}>Loading rules...</p>
+    <div style={styles.loadingContainer}>
+      <div style={styles.loadingSpinner}></div>
+      <p style={styles.loadingText}>Loading rules...</p>
     </div>
   );
 
   return (
-    <>
+    <div style={styles.container}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+      <div style={styles.header}>
         <div>
-          <h1 style={{ margin: 0, fontSize: 28 }}>🎯 Main Bingo Rules</h1>
-          <p style={{ color: '#888', fontSize: 13, margin: '4px 0 0 0' }}>
-            Manage winning conditions and test them
-          </p>
+          <h1 style={styles.title}>🎯 Main Bingo Rules</h1>
+          <p style={styles.subtitle}>Manage winning conditions and test them</p>
         </div>
-        <button onClick={openCreate} style={{ 
-          padding: '12px 28px', background: '#FF4757', color: '#fff', border: 'none', 
-          borderRadius: 10, cursor: 'pointer', fontWeight: 700, fontSize: 14,
-          boxShadow: '0 4px 15px rgba(255,71,87,0.3)'
-        }}>
+        <button onClick={openCreate} style={styles.createBtn}>
           + Create New Rule
         </button>
       </div>
 
-       <div style={{ 
-        background: '#0a0a1e', padding: 24, borderRadius: 16, 
-        marginBottom: 24, border: '1px solid #1a1a3e' 
-      }}>
+      {/* Scheduled Games Section */}
+      <div style={styles.scheduledSection}>
         <ScheduledGames />
       </div>
 
       {/* Rules Grid */}
       {rules.length === 0 && (
-        <div style={{ textAlign: 'center', padding: 60, background: '#16213e', borderRadius: 16 }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>🎱</div>
-          <p style={{ color: '#888', fontSize: 16 }}>No rules yet. Create your first rule!</p>
+        <div style={styles.emptyState}>
+          <div style={styles.emptyIcon}>🎱</div>
+          <p style={styles.emptyText}>No rules yet. Create your first rule!</p>
         </div>
       )}
       
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: 20 }}>
+      <div style={styles.grid}>
         {rules.map(rule => (
           <RuleCard
             key={rule._id}
@@ -284,6 +275,114 @@ export default function MainBingoRulesPage() {
           onDeleteSample={deleteSample} 
         />
       )}
-    </>
+    </div>
   );
 }
+
+// ============================================
+// STYLES - White/Gold/Black Theme
+// ============================================
+const styles = {
+  container: {
+    padding: '4px 0',
+    maxWidth: '1400px',
+    margin: '0 auto',
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '24px',
+    flexWrap: 'wrap',
+    gap: '16px',
+  },
+  title: {
+    fontSize: '28px',
+    fontWeight: 700,
+    color: '#1a1a2e',
+    margin: 0,
+    letterSpacing: '-0.5px',
+  },
+  subtitle: {
+    fontSize: '14px',
+    color: '#6b7280',
+    margin: '4px 0 0 0',
+  },
+  createBtn: {
+    padding: '12px 28px',
+    background: 'linear-gradient(135deg, #d4af37, #b8962f)',
+    color: '#fff',
+    border: '2px solid #000000',
+    borderRadius: '10px',
+    cursor: 'pointer',
+    fontWeight: 700,
+    fontSize: '14px',
+    boxShadow: '0 4px 16px rgba(212,175,55,0.25)',
+    transition: 'all 0.3s ease',
+    letterSpacing: '0.3px',
+  },
+  scheduledSection: {
+    background: '#ffffff',
+    border: '2px solid #000000',
+    borderRadius: '14px',
+    padding: '20px',
+    marginBottom: '24px',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+  },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))',
+    gap: '20px',
+  },
+  emptyState: {
+    textAlign: 'center',
+    padding: '60px',
+    background: '#ffffff',
+    border: '2px solid #000000',
+    borderRadius: '14px',
+  },
+  emptyIcon: {
+    fontSize: '48px',
+    marginBottom: '16px',
+  },
+  emptyText: {
+    color: '#6b7280',
+    fontSize: '16px',
+    margin: 0,
+  },
+  loadingContainer: {
+    textAlign: 'center',
+    padding: '50px',
+    background: '#ffffff',
+    border: '2px solid #000000',
+    borderRadius: '14px',
+  },
+  loadingSpinner: {
+    width: '40px',
+    height: '40px',
+    border: '3px solid #e5e7eb',
+    borderTop: '3px solid #d4af37',
+    borderRadius: '50%',
+    animation: 'spin 0.8s linear infinite',
+    margin: '0 auto 12px',
+  },
+  loadingText: {
+    color: '#6b7280',
+    fontSize: '14px',
+    margin: 0,
+  },
+};
+
+// Add keyframe animation for spinner
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .create-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(212,175,55,0.3);
+  }
+`;
+document.head.appendChild(style);

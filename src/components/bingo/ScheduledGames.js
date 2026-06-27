@@ -68,100 +68,255 @@ export default function ScheduledGames() {
     } catch { toast.error('Failed'); }
   };
 
-  if (loading) return <div style={{ textAlign: 'center', padding: 20, color: '#888' }}>Loading...</div>;
+  if (loading) return <div style={styles.loading}>Loading...</div>;
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ margin: 0, fontSize: 20 }}>📅 Scheduled Games</h2>
-        <button onClick={() => setShowForm(!showForm)} style={{
-          padding: '10px 20px', background: '#FFA502', color: '#000',
-          border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 700
-        }}>
+    <div style={styles.container}>
+      {/* Header */}
+      <div style={styles.header}>
+        <h2 style={styles.title}>📅 Scheduled Games</h2>
+        <button onClick={() => setShowForm(!showForm)} style={styles.toggleBtn}>
           {showForm ? '✕ Cancel' : '+ Schedule Game'}
         </button>
       </div>
 
       {/* Create Form */}
       {showForm && (
-        <div style={{ background: '#16213e', padding: 20, borderRadius: 12, marginBottom: 20 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div style={styles.formContainer}>
+          <div style={styles.formGrid}>
             <div>
-              <label style={labelStyle}>Game Name</label>
+              <label style={styles.label}>Game Name</label>
               <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} 
-                placeholder="e.g., Friday Special" style={inputStyle} />
+                placeholder="e.g., Friday Special" style={styles.input} />
             </div>
             <div>
-              <label style={labelStyle}>Rule</label>
-              <select value={form.ruleId} onChange={e => setForm({...form, ruleId: e.target.value})} style={inputStyle}>
+              <label style={styles.label}>Rule</label>
+              <select value={form.ruleId} onChange={e => setForm({...form, ruleId: e.target.value})} style={styles.input}>
                 <option value="">Select Rule</option>
                 {rules.map(r => <option key={r._id} value={r._id}>{r.name}</option>)}
               </select>
             </div>
             <div>
-              <label style={labelStyle}>Start Time</label>
+              <label style={styles.label}>Start Time</label>
               <input type="datetime-local" value={form.startTime} 
-                onChange={e => setForm({...form, startTime: e.target.value})} style={inputStyle} />
+                onChange={e => setForm({...form, startTime: e.target.value})} style={styles.input} />
             </div>
             <div>
-              <label style={labelStyle}>Card Price</label>
+              <label style={styles.label}>Card Price (ETB)</label>
               <input type="number" value={form.cardPrice} 
-                onChange={e => setForm({...form, cardPrice: parseInt(e.target.value)})} style={inputStyle} />
+                onChange={e => setForm({...form, cardPrice: parseInt(e.target.value)})} style={styles.input} />
             </div>
             <div>
-              <label style={labelStyle}>Prize</label>
+              <label style={styles.label}>Prize (ETB)</label>
               <input type="number" value={form.prize} 
-                onChange={e => setForm({...form, prize: parseInt(e.target.value)})} style={inputStyle} />
+                onChange={e => setForm({...form, prize: parseInt(e.target.value)})} style={styles.input} />
             </div>
             <div>
-              <label style={labelStyle}>Max Players</label>
+              <label style={styles.label}>Max Players</label>
               <input type="number" value={form.maxPlayers} 
-                onChange={e => setForm({...form, maxPlayers: parseInt(e.target.value)})} style={inputStyle} />
+                onChange={e => setForm({...form, maxPlayers: parseInt(e.target.value)})} style={styles.input} />
             </div>
           </div>
-          <button onClick={createGame} style={{
-            width: '100%', marginTop: 15, padding: 12, background: '#2ED573', color: '#000',
-            border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 700
-          }}>
+          <button onClick={createGame} style={styles.submitBtn}>
             💾 Schedule Game
           </button>
         </div>
       )}
 
       {/* Games List */}
-      <div style={{ display: 'grid', gap: 12 }}>
-        {games.length === 0 && <p style={{ color: '#888', textAlign: 'center' }}>No scheduled games</p>}
-        {games.map(game => (
-          <div key={game._id} style={{
-            background: '#16213e', padding: 16, borderRadius: 12,
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-          }}>
-            <div>
-              <h4 style={{ margin: 0, color: '#FFA502' }}>{game.name}</h4>
-              <p style={{ margin: '4px 0 0', fontSize: 12, color: '#888' }}>
-                Rule: {game.rule?.name || 'N/A'} | 
-                Start: {new Date(game.startTime).toLocaleString()} | 
-                Price: {game.cardPrice} | Prize: {game.prize}
-              </p>
-              <span style={{
-                fontSize: 10, padding: '2px 8px', borderRadius: 10,
-                background: game.status === 'scheduled' ? '#FFA502' : game.status === 'active' ? '#2ED573' : '#888',
-                color: '#000', fontWeight: 600
-              }}>
-                {game.status}
-              </span>
+      <div style={styles.gamesList}>
+        {games.length === 0 && (
+          <p style={styles.emptyText}>No scheduled games</p>
+        )}
+        {games.map(game => {
+          const statusColors = {
+            scheduled: { bg: '#fef3c7', color: '#b8962f' },
+            active: { bg: '#d1fae5', color: '#065f46' },
+            completed: { bg: '#e5e7eb', color: '#6b7280' },
+            cancelled: { bg: '#fee2e2', color: '#991b1b' }
+          };
+          const statusStyle = statusColors[game.status] || statusColors.scheduled;
+          
+          return (
+            <div key={game._id} style={styles.gameCard}>
+              <div>
+                <h4 style={styles.gameName}>{game.name}</h4>
+                <p style={styles.gameDetails}>
+                  Rule: <span style={styles.gameDetailsHighlight}>{game.rule?.name || 'N/A'}</span> | 
+                  Start: <span style={styles.gameDetailsHighlight}>{new Date(game.startTime).toLocaleString()}</span> | 
+                  Price: <span style={styles.gameDetailsHighlight}>{game.cardPrice} ETB</span> | 
+                  Prize: <span style={styles.gameDetailsHighlight}>{game.prize} ETB</span>
+                </p>
+                <span style={{
+                  ...styles.statusBadge,
+                  background: statusStyle.bg,
+                  color: statusStyle.color,
+                  border: `1px solid ${statusStyle.color}`,
+                }}>
+                  {game.status}
+                </span>
+              </div>
+              <div style={styles.gameActions}>
+                <button onClick={() => resetGame(game._id)} style={styles.resetBtn}>🔄 Reset</button>
+                <button onClick={() => deleteGame(game._id)} style={styles.deleteBtn}>🗑</button>
+              </div>
             </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => resetGame(game._id)} style={btnStyle('#FFA502', '#000')}>🔄 Reset</button>
-              <button onClick={() => deleteGame(game._id)} style={btnStyle('#3a0a0a', '#FF4757')}>🗑</button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
 }
 
-const labelStyle = { fontSize: 11, color: '#888', display: 'block', marginBottom: 4 };
-const inputStyle = { width: '100%', padding: 10, background: '#0f3460', color: '#fff', border: '1px solid #333', borderRadius: 6, fontSize: 13 };
-const btnStyle = (bg, color) => ({ padding: '8px 14px', background: bg, color, border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontWeight: 600 });
+// ============================================
+// STYLES - White/Gold/Black Theme
+// ============================================
+const styles = {
+  container: {
+    background: '#ffffff',
+    padding: '20px',
+    borderRadius: '14px',
+    border: '2px solid #000000',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '20px',
+  },
+  title: {
+    margin: 0,
+    fontSize: '20px',
+    fontWeight: 700,
+    color: '#1a1a2e',
+  },
+  toggleBtn: {
+    padding: '10px 20px',
+    background: 'linear-gradient(135deg, #d4af37, #b8962f)',
+    color: '#fff',
+    border: '2px solid #000000',
+    borderRadius: '10px',
+    cursor: 'pointer',
+    fontWeight: 700,
+    fontSize: '13px',
+    transition: 'all 0.3s ease',
+    boxShadow: '0 4px 16px rgba(212,175,55,0.25)',
+  },
+  formContainer: {
+    background: '#f9fafb',
+    padding: '20px',
+    borderRadius: '12px',
+    marginBottom: '20px',
+    border: '1px solid #e5e7eb',
+  },
+  formGrid: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '12px',
+  },
+  label: {
+    fontSize: '11px',
+    color: '#6b7280',
+    display: 'block',
+    marginBottom: '4px',
+    fontWeight: 500,
+  },
+  input: {
+    width: '100%',
+    padding: '10px',
+    background: '#ffffff',
+    color: '#1a1a2e',
+    border: '1px solid #e5e7eb',
+    borderRadius: '8px',
+    fontSize: '13px',
+    outline: 'none',
+    transition: 'border-color 0.2s',
+  },
+  submitBtn: {
+    width: '100%',
+    marginTop: '15px',
+    padding: '12px',
+    background: 'linear-gradient(135deg, #d4af37, #b8962f)',
+    color: '#fff',
+    border: '2px solid #000000',
+    borderRadius: '10px',
+    cursor: 'pointer',
+    fontWeight: 700,
+    fontSize: '14px',
+    transition: 'all 0.3s ease',
+    boxShadow: '0 4px 16px rgba(212,175,55,0.25)',
+  },
+  gamesList: {
+    display: 'grid',
+    gap: '12px',
+  },
+  emptyText: {
+    color: '#6b7280',
+    textAlign: 'center',
+    padding: '20px',
+  },
+  gameCard: {
+    background: '#f9fafb',
+    padding: '16px',
+    borderRadius: '12px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    border: '1px solid #e5e7eb',
+    transition: 'all 0.2s ease',
+  },
+  gameName: {
+    margin: 0,
+    color: '#1a1a2e',
+    fontSize: '16px',
+    fontWeight: 700,
+  },
+  gameDetails: {
+    margin: '4px 0 0',
+    fontSize: '12px',
+    color: '#6b7280',
+  },
+  gameDetailsHighlight: {
+    color: '#1a1a2e',
+    fontWeight: 600,
+  },
+  statusBadge: {
+    fontSize: '10px',
+    padding: '2px 10px',
+    borderRadius: '12px',
+    fontWeight: 600,
+    display: 'inline-block',
+  },
+  gameActions: {
+    display: 'flex',
+    gap: '8px',
+  },
+  resetBtn: {
+    padding: '8px 14px',
+    background: '#fef3c7',
+    color: '#b8962f',
+    border: '1px solid #d4af37',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '12px',
+    fontWeight: 600,
+    transition: 'all 0.2s ease',
+  },
+  deleteBtn: {
+    padding: '8px 14px',
+    background: '#fee2e2',
+    color: '#991b1b',
+    border: '1px solid #ef4444',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '12px',
+    fontWeight: 600,
+    transition: 'all 0.2s ease',
+  },
+  loading: {
+    textAlign: 'center',
+    padding: '20px',
+    color: '#6b7280',
+  },
+};
