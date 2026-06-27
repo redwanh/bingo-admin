@@ -2,12 +2,14 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import AdminLayout from './components/AdminLayout';
 import Login from './pages/Login';
+
+// Import all pages
 import Dashboard from './pages/Dashboard';
 import Users from './pages/Users/index';
 import GameConfig from './pages/GameConfig';
-
 import VoiceManager from './pages/VoiceManager';
 import GameMonitor from './pages/GameMonitor';
 import MainBingoRules from './pages/MainBingoRules';
@@ -23,22 +25,65 @@ function App() {
       <BrowserRouter>
         <Toaster position="top-right" toastOptions={{ style: { background: '#1a1a2e', color: '#fff' } }} />
         <Routes>
-          {/* Public */}
+          {/* Public Route */}
           <Route path="/login" element={<Login />} />
 
-          {/* Protected � All wrapped in AdminLayout */}
-          <Route path="/dashboard" element={<AdminLayout><Dashboard /></AdminLayout>} />
-          <Route path="/users" element={<AdminLayout><Users /></AdminLayout>} />
-          <Route path="/game-config" element={<AdminLayout><GameConfig /></AdminLayout>} />
-          <Route path="/main-bingo-rules" element={<AdminLayout><MainBingoRules /></AdminLayout>} />
-        
-          <Route path="/main-bingo-monitor" element={<AdminLayout><MainBingoMonitor /></AdminLayout>} />
-          <Route path="/voice-manager" element={<AdminLayout><VoiceManager /></AdminLayout>} />
-          <Route path="/game-monitor" element={<AdminLayout><GameMonitor /></AdminLayout>} />
-          
-          <Route path="/transactions" element={<AdminLayout><Transactions /></AdminLayout>} />
-          <Route path="/deposits" element={<AdminLayout><Deposits /></AdminLayout>} />
-          <Route path="/cms" element={<AdminLayout><CMS /></AdminLayout>} />          <Route path="/app-settings" element={<AdminLayout><AppSettings /></AdminLayout>} />
+          {/* Protected Routes - Now wrapped with ProtectedRoute */}
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <AdminLayout><Dashboard /></AdminLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/users" element={
+            <ProtectedRoute>
+              <AdminLayout><Users /></AdminLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/game-config" element={
+            <ProtectedRoute>
+              <AdminLayout><GameConfig /></AdminLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/main-bingo-rules" element={
+            <ProtectedRoute>
+              <AdminLayout><MainBingoRules /></AdminLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/main-bingo-monitor" element={
+            <ProtectedRoute>
+              <AdminLayout><MainBingoMonitor /></AdminLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/voice-manager" element={
+            <ProtectedRoute>
+              <AdminLayout><VoiceManager /></AdminLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/game-monitor" element={
+            <ProtectedRoute>
+              <AdminLayout><GameMonitor /></AdminLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/transactions" element={
+            <ProtectedRoute>
+              <AdminLayout><Transactions /></AdminLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/deposits" element={
+            <ProtectedRoute>
+              <AdminLayout><Deposits /></AdminLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/cms" element={
+            <ProtectedRoute>
+              <AdminLayout><CMS /></AdminLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/app-settings" element={
+            <ProtectedRoute>
+              <AdminLayout><AppSettings /></AdminLayout>
+            </ProtectedRoute>
+          } />
 
           {/* Default */}
           <Route path="/" element={<Navigate to="/dashboard" />} />
@@ -49,12 +94,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-
-
-
-
-

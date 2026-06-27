@@ -1,0 +1,109 @@
+﻿/* ========================================
+   Pagination.css - White & Gold with Black Borders
+   ======================================== */
+
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0 4px 0;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pagination-btn {
+  padding: 8px 18px;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #1a1a2e;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  border-color: #d4af37;
+  background: rgba(212, 175, 55, 0.04);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-pages {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.page-btn {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 8px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-btn:hover:not(.dots):not(.active) {
+  background: #f3f4f6;
+  border-color: #000000;
+}
+
+.page-btn.active {
+  background: #d4af37;
+  color: #ffffff;
+  border-color: #000000;
+  font-weight: 600;
+}
+
+.page-btn.dots {
+  cursor: default;
+  color: #9ca3af;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .pagination-container {
+    justify-content: center;
+  }
+
+  .pagination-btn {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+
+  .page-btn {
+    min-width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pagination-container {
+    gap: 8px;
+  }
+
+  .pagination-btn {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  .page-btn {
+    min-width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+}

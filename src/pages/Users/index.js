@@ -1,11 +1,11 @@
-﻿// pages/Users/index.js
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useUsers } from './hooks/useUsers';
 import UserToolbar from './components/UserToolbar';
 import UserTable from './components/UserTable';
 import BalanceModal from './components/BalanceModal';
 import Pagination from './components/Pagination';
+import './Users.css';
 
 export default function Users() {
   const { user: authUser } = useAuth();
@@ -19,28 +19,35 @@ export default function Users() {
   } = useUsers();
 
   return (
-    <>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <h1 style={{ margin: 0, fontSize: 28 }}>👥 User Management</h1>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <div style={{
-            padding: '8px 16px', borderRadius: 10, background: '#16213e',
-            border: '1px solid rgba(255,255,255,0.06)', color: '#FFD700',
-            fontWeight: 700, fontSize: 13,
-          }}>
-            Total: {totalUsers}
+    <div className="users-container">
+      {/* Header */}
+      <div className="users-header">
+        <div className="users-title-group">
+          <h1 className="users-title">👥 User Management</h1>
+          <span className="users-subtitle">Manage and monitor all platform users</span>
+        </div>
+        <div className="users-stats">
+          <div className="users-stat-badge">
+            <span className="stat-number">{totalUsers}</span>
+            <span className="stat-label">Total Users</span>
           </div>
         </div>
       </div>
 
+      {/* Toolbar */}
       <UserToolbar
-        search={search} onSearch={handleSearch}
+        search={search}
+        onSearch={handleSearch}
         totalUsers={totalUsers}
-        roleFilter={roleFilter} onRoleFilter={setRoleFilter}
-        statusFilter={statusFilter} onStatusFilter={setStatusFilter}
-        sortBy={sortBy} onSortBy={setSortBy}
+        roleFilter={roleFilter}
+        onRoleFilter={setRoleFilter}
+        statusFilter={statusFilter}
+        onStatusFilter={setStatusFilter}
+        sortBy={sortBy}
+        onSortBy={setSortBy}
       />
 
+      {/* Table */}
       <UserTable
         users={users}
         loading={loading}
@@ -49,8 +56,10 @@ export default function Users() {
         userRole={authUser?.role}
       />
 
+      {/* Pagination */}
       <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
 
+      {/* Modal */}
       {selectedUser && (
         <BalanceModal
           user={selectedUser}
@@ -58,7 +67,6 @@ export default function Users() {
           onSuccess={fetchUsers}
         />
       )}
-    </>
+    </div>
   );
 }
-

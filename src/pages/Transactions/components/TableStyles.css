@@ -1,0 +1,467 @@
+/* ========================================
+   TableStyles.css - Shared Table Styles
+   White/Gold/Black Theme
+   ======================================== */
+
+/* ===== Container ===== */
+.table-container {
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* ===== Table ===== */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.data-table thead {
+  background: #f9fafb;
+  border-bottom: 2px solid #000000;
+}
+
+.data-table th {
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1a1a2e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #000000;
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #1a1a2e;
+  vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tbody tr.even {
+  background: #ffffff;
+}
+
+.data-table tbody tr.odd {
+  background: #fafafa;
+}
+
+.data-table tbody tr:hover {
+  background: rgba(212, 175, 55, 0.04);
+}
+
+/* ===== User Cell ===== */
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.user-avatar.gold {
+  background: linear-gradient(135deg, #d4af37, #b8962f);
+}
+
+.user-avatar.red {
+  background: linear-gradient(135deg, #991b1b, #7f1d1d);
+}
+
+.user-avatar.small {
+  width: 28px;
+  height: 28px;
+  font-size: 11px;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+/* ===== Amount Cells ===== */
+.amount-cell {
+  font-weight: 700;
+}
+
+.amount-cell.credit {
+  color: #065f46;
+}
+
+.amount-cell.debit {
+  color: #991b1b;
+}
+
+.amount-cell.gold {
+  color: #b8962f;
+}
+
+/* ===== Muted Cell ===== */
+.muted-cell {
+  color: #6b7280;
+}
+
+/* ===== Type Cell ===== */
+.type-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.type-icon {
+  font-size: 14px;
+}
+
+.type-label {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* ===== Status Badge ===== */
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: 1px solid #000000;
+}
+
+.status-badge.pending {
+  background: #fef3c7;
+  color: #b8962f;
+}
+
+.status-badge.approved {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-badge.completed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.failed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ===== Action Buttons ===== */
+.action-col {
+  text-align: center;
+  min-width: 120px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid #000000;
+  font-weight: 600;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #ffffff;
+  color: #1a1a2e;
+}
+
+.action-btn.approve {
+  background: #d1fae5;
+  color: #065f46;
+  border-color: #065f46;
+}
+
+.action-btn.approve:hover {
+  background: #a7f3d0;
+}
+
+.action-btn.reject {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #991b1b;
+}
+
+.action-btn.reject:hover {
+  background: #fecaca;
+}
+
+/* ===== Journal Filters ===== */
+.journal-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.journal-filters .search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #000000;
+  background: #ffffff;
+  color: #1a1a2e;
+  font-size: 13px;
+  outline: none;
+}
+
+.journal-filters .search-input:focus {
+  border-color: #d4af37;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  background: #ffffff;
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid #000000;
+}
+
+.filter-btn:hover {
+  background: rgba(212, 175, 55, 0.05);
+}
+
+.filter-btn.active {
+  background: rgba(212, 175, 55, 0.1);
+  border-color: #d4af37;
+  color: #b8962f;
+  font-weight: 700;
+}
+
+/* ===== Balance Cell ===== */
+.balance-cell {
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+/* ===== Description Cell ===== */
+.description {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===== Date Cell ===== */
+.date-cell {
+  white-space: nowrap;
+}
+
+/* ===== Total Row ===== */
+.total-row {
+  background: #f9fafb !important;
+  border-top: 2px solid #000000;
+  font-weight: 700;
+}
+
+.total-row td {
+  padding: 12px 16px;
+  border-top: 2px solid #000000;
+}
+
+.total-label {
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+/* ===== States ===== */
+.loading-state {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 12px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 12px;
+}
+
+/* ===== Pagination ===== */
+.pagination-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 12px 0;
+}
+
+.page-btn {
+  padding: 8px 18px;
+  border: 1px solid #000000;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1a1a2e;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: #d4af37;
+  background: rgba(212, 175, 55, 0.05);
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .data-table th,
+  .data-table td {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .data-table td {
+    font-size: 12px;
+  }
+
+  .action-col {
+    min-width: 80px;
+  }
+
+  .action-btn {
+    padding: 4px 10px;
+    font-size: 10px;
+  }
+
+  .journal-filters {
+    flex-direction: column;
+  }
+
+  .journal-filters .search-input {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .filter-buttons {
+    justify-content: center;
+  }
+
+  .filter-btn {
+    font-size: 10px;
+    padding: 6px 10px;
+  }
+
+  .description {
+    max-width: 100px;
+  }
+
+  .date-cell {
+    font-size: 11px;
+  }
+
+  .muted-cell {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .data-table th,
+  .data-table td {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  .user-avatar {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+  }
+
+  .user-name {
+    font-size: 11px;
+  }
+
+  .amount-cell {
+    font-size: 11px;
+  }
+
+  .status-badge {
+    font-size: 9px;
+    padding: 2px 8px;
+  }
+
+  .action-btn {
+    padding: 3px 8px;
+    font-size: 9px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .page-btn {
+    padding: 4px 12px;
+    font-size: 11px;
+  }
+
+  .page-info {
+    font-size: 12px;
+  }
+}

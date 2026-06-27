@@ -1,0 +1,139 @@
+/* ========================================
+   Transactions.css - Classic White/Gold/Black Theme
+   ======================================== */
+
+.transactions-page {
+  padding: 4px 0;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ===== HEADER ===== */
+.transactions-header {
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ===== TABS ===== */
+.tabs-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  padding: 6px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  background: rgba(212, 175, 55, 0.06);
+  color: #1a1a2e;
+}
+
+.tab-btn.active {
+  background: #d4af37;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.tab-btn.active:hover {
+  background: #b8962f;
+}
+
+.tab-badge {
+  background: #d4af37;
+  color: #ffffff;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.tab-btn.active .tab-badge {
+  background: #ffffff;
+  color: #1a1a2e;
+}
+
+/* ===== TAB CONTENT ===== */
+.tab-content {
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  overflow: hidden;
+  min-height: 400px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 22px;
+  }
+
+  .page-subtitle {
+    font-size: 13px;
+  }
+
+  .tabs-bar {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding: 4px;
+    gap: 2px;
+  }
+
+  .tab-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .tab-content {
+    border-radius: 8px;
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 20px;
+  }
+
+  .tab-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .tab-badge {
+    font-size: 9px;
+    padding: 1px 6px;
+  }
+}
