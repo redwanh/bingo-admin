@@ -1,4 +1,4 @@
-// pages/Deposits/index.js � Account Management
+// pages/Deposits/index.js — Account Management
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -48,7 +48,7 @@ export default function Deposits() {
       await axios.post(API + '/payments/seed', {}, { headers });
       toast.success('Sample accounts created!');
       fetchAccounts();
-    } catch (e) { toast.error('Seed failed � accounts may already exist'); }
+    } catch (e) { toast.error('Seed failed — accounts may already exist'); }
   };
 
   const deleteAccount = async (id) => {
@@ -64,12 +64,12 @@ export default function Deposits() {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <h1 style={{ margin: 0, fontSize: 28 }}>?? Transaction Account Management</h1>
+        <h1 style={{ margin: 0, fontSize: 28 }}>💳 Transaction Account Management</h1>
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={seedAccounts} style={{
             padding: '10px 18px', borderRadius: 10, border: '1px solid #FFD700',
             background: 'transparent', color: '#FFD700', cursor: 'pointer', fontSize: 13, fontWeight: 600,
-          }}>?? Seed Sample Data</button>
+          }}>🌱 Seed Sample Data</button>
           <button onClick={() => setEditAccount({
             type: 'telebirr', accountName: '', phone: '', accountNumber: '',
             instructionsEn: '', instructionsAm: '', instructionsTg: '',
@@ -82,13 +82,13 @@ export default function Deposits() {
       </div>
 
       <p style={{ color: '#888', marginBottom: 24, fontSize: 14 }}>
-        Configure payment accounts for deposits � Telebirr and CBE with instructions in multiple languages.
+        Configure payment accounts for deposits — Telebirr and CBE with instructions in multiple languages.
       </p>
 
       {/* Loading */}
       {loading && (
         <div style={{ textAlign: 'center', padding: 60 }}>
-          <div style={{ fontSize: 32, marginBottom: 8 }}>?</div>
+          <div style={{ fontSize: 32, marginBottom: 8 }}>⏳</div>
           <p style={{ color: '#A0A0B8' }}>Loading accounts...</p>
         </div>
       )}
@@ -96,7 +96,7 @@ export default function Deposits() {
       {/* Empty */}
       {!loading && accounts.length === 0 && (
         <div style={{ textAlign: 'center', padding: 60 }}>
-          <div style={{ fontSize: 48, marginBottom: 12 }}>??</div>
+          <div style={{ fontSize: 48, marginBottom: 12 }}>🏦</div>
           <p style={{ color: '#A0A0B8', fontSize: 15, fontWeight: 600, margin: '0 0 4px' }}>No payment accounts configured</p>
           <p style={{ color: '#666', fontSize: 13, margin: '0 0 16px' }}>Click "Seed Sample Data" or "Add Account" to create one.</p>
         </div>
@@ -119,7 +119,7 @@ export default function Deposits() {
                   color: acc.type === 'telebirr' ? '#00B4D8' : '#2ED573',
                   textTransform: 'uppercase', marginBottom: 8,
                 }}>
-                  {acc.type === 'telebirr' ? '?? Telebirr' : '?? CBE'}
+                  {acc.type === 'telebirr' ? '📱 Telebirr' : '🏦 CBE'}
                 </span>
                 <p style={{ fontWeight: 700, fontSize: 16, color: '#fff', margin: 0 }}>{acc.accountName}</p>
               </div>
@@ -127,11 +127,11 @@ export default function Deposits() {
                 <button onClick={() => setEditAccount(acc)} style={{
                   padding: '6px 12px', borderRadius: 6, border: 'none',
                   background: 'rgba(255,215,0,0.1)', color: '#FFD700', cursor: 'pointer', fontSize: 12,
-                }}>?? Edit</button>
+                }}>✏️ Edit</button>
                 <button onClick={() => deleteAccount(acc._id)} style={{
                   padding: '6px 12px', borderRadius: 6, border: 'none',
                   background: 'rgba(255,71,87,0.1)', color: '#FF4757', cursor: 'pointer', fontSize: 12,
-                }}>???</button>
+                }}>🗑️</button>
               </div>
             </div>
 
@@ -141,7 +141,7 @@ export default function Deposits() {
                 <div style={{ background: '#0f3460', padding: 10, borderRadius: 8 }}>
                   <p style={{ fontSize: 10, color: '#888', margin: '0 0 2px' }}>Phone Number</p>
                   <p style={{ fontSize: 14, fontWeight: 700, color: '#00B4D8', margin: 0, fontFamily: 'monospace' }}>
-                    {acc.phone || '�'}
+                    {acc.phone || '—'}
                   </p>
                 </div>
               )}
@@ -149,14 +149,14 @@ export default function Deposits() {
                 <div style={{ background: '#0f3460', padding: 10, borderRadius: 8 }}>
                   <p style={{ fontSize: 10, color: '#888', margin: '0 0 2px' }}>Account Number</p>
                   <p style={{ fontSize: 14, fontWeight: 700, color: '#2ED573', margin: 0, fontFamily: 'monospace' }}>
-                    {acc.accountNumber || '�'}
+                    {acc.accountNumber || '—'}
                   </p>
                 </div>
               )}
               <div style={{ background: '#0f3460', padding: 10, borderRadius: 8 }}>
                 <p style={{ fontSize: 10, color: '#888', margin: '0 0 2px' }}>Deposit Limits</p>
                 <p style={{ fontSize: 13, fontWeight: 600, color: '#FFD700', margin: 0 }}>
-                  {acc.minDeposit} � {acc.maxDeposit} ETB
+                  {acc.minDeposit} – {acc.maxDeposit} ETB
                 </p>
               </div>
             </div>
@@ -181,12 +181,12 @@ export default function Deposits() {
           }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <h2 style={{ margin: 0, fontSize: 20, color: '#FFD700' }}>
-                {editAccount._id ? '?? Edit Account' : '? New Account'}
+                {editAccount._id ? '✏️ Edit Account' : '➕ New Account'}
               </h2>
               <button onClick={() => setEditAccount(null)} style={{
                 width: 32, height: 32, borderRadius: '50%', border: 'none',
                 background: '#333', color: '#fff', cursor: 'pointer', fontSize: 16,
-              }}>?</button>
+              }}>✕</button>
             </div>
 
             <form onSubmit={saveAccount}>
@@ -227,15 +227,15 @@ export default function Deposits() {
                 </div>
               </div>
 
-              <label style={labelStyle}>Instructions (???? English)</label>
+              <label style={labelStyle}>Instructions (🇬🇧 English)</label>
               <textarea value={editAccount.instructionsEn || ''} onChange={e => setEditAccount({...editAccount, instructionsEn: e.target.value})}
                 rows={3} style={{...inputStyle, resize: 'vertical', marginBottom: 8}} placeholder="Step-by-step instructions..." />
 
-              <label style={labelStyle}>Instructions (???? ????)</label>
+              <label style={labelStyle}>Instructions (🇪🇹 አማርኛ)</label>
               <textarea value={editAccount.instructionsAm || ''} onChange={e => setEditAccount({...editAccount, instructionsAm: e.target.value})}
                 rows={3} style={{...inputStyle, resize: 'vertical', marginBottom: 8}} />
 
-              <label style={labelStyle}>Instructions (???? ????)</label>
+              <label style={labelStyle}>Instructions (🇪🇹 ትግርኛ)</label>
               <textarea value={editAccount.instructionsTg || ''} onChange={e => setEditAccount({...editAccount, instructionsTg: e.target.value})}
                 rows={3} style={{...inputStyle, resize: 'vertical', marginBottom: 8}} />
 
@@ -244,7 +244,7 @@ export default function Deposits() {
                   flex: 1, padding: 14, borderRadius: 12, border: 'none',
                   background: 'linear-gradient(135deg, #FFD700, #FF8C00)',
                   color: '#1a1a2e', fontWeight: 700, fontSize: 15, cursor: 'pointer',
-                }}>?? Save Account</button>
+                }}>💾 Save Account</button>
                 <button type="button" onClick={() => setEditAccount(null)} style={{
                   padding: '14px 24px', borderRadius: 12, border: '1px solid #333',
                   background: 'transparent', color: '#A0A0B8', cursor: 'pointer', fontSize: 14,
@@ -257,4 +257,3 @@ export default function Deposits() {
     </>
   );
 }
-

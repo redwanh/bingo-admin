@@ -49,7 +49,7 @@ export default function AdminLayout({ children }) {
             color: '#FFD700', marginBottom: 24, fontSize: 20, fontWeight: 800,
             cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8
           }} onClick={() => navigate('/dashboard')}>
-            ?? Bingo Admin
+            🎯 Bingo Admin
           </h2>
 
           {/* Navigation */}
