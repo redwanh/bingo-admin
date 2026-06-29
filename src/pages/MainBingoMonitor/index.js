@@ -28,6 +28,9 @@ export default function MainBingoMonitor() {
   const [loading, setLoading] = useState(true);
   const [prizeLoading, setPrizeLoading] = useState(false);
   const [prizeInitialized, setPrizeInitialized] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [resetMode, setResetMode] = useState('clear'); // 'clear' or 'delete'
   
   // Collapsible sections state
   const [showTiming, setShowTiming] = useState(false);
@@ -152,6 +155,38 @@ export default function MainBingoMonitor() {
     setPrizeLoading(false);
   };
 
+  // UPDATED: Reset Cards Function - Now resets actual cards in DB
+ // Updated resetCards function
+const resetCards = async () => {
+  setResetLoading(true);
+  try {
+    const headers = { Authorization: 'Bearer ' + localStorage.getItem('token') };
+    
+    // Send the reset mode with game info
+    const res = await axios.post(API + '/main-bingo/reset-cards', { 
+      mode: resetMode, // 'clear', 'delete', or 'full-reset'
+      gameId: monitor?.game?._id || monitor?.game?.id,
+      force: true // Force reset even if 0 cards
+    }, { headers });
+    
+    const messages = {
+      'delete': `Deleted ${res.data.affectedCards || 0} cards from database`,
+      'clear': `Cleared ${res.data.affectedCards || 0} cards to initial state`,
+      'full-reset': `Full database reset completed`
+    };
+    
+    toast.success(messages[resetMode] || 'Reset completed');
+    setShowResetConfirm(false);
+    setPrizeInitialized(false);
+    fetchMonitor();
+  } catch (e) {
+    toast.error(e.response?.data?.error || 'Failed to reset cards');
+    console.error('Reset cards error:', e);
+  } finally {
+    setResetLoading(false);
+  }
+};
+
   const calculatePrizeFromCommission = () => {
     const minPrizeThreshold = form.minimumPrizeThreshold || 100;
     
@@ -204,17 +239,30 @@ export default function MainBingoMonitor() {
   const isCountdown = monitor?.game?.status === 'countdown';
   const isLive = monitor?.game?.status === 'in_progress';
 
-  return (
-    <div className="monitor-container">
-      {/* HEADER */}
-      <div className="monitor-header">
-        <h1 className="monitor-title">🎱 Main Bingo Monitor</h1>
+ return (
+  <div className="monitor-container">
+    {/* HEADER */}
+    <div className="monitor-header">
+      <h1 className="monitor-title">🎱 Main Bingo Monitor</h1>
+      <div className="header-actions">
         {hasActive && (
           <span className={`status-pill ${isLive ? 'pill-live' : isCountdown ? 'pill-countdown' : 'pill-setup'}`}>
             {isLive ? '🔴 LIVE' : isCountdown ? '⏳ STARTING' : '⚙️ SETUP'}
           </span>
         )}
+        
+        {/* Reset button: Show during setup OR when no game exists */}
+        {(isSetup || !monitor?.game) && (
+          <button 
+            onClick={() => setShowResetConfirm(true)} 
+            className="btn-reset-cards"
+            title="Reset all cards in database (Debug/Test)"
+          >
+            🔄 Reset Cards DB {totalCards > 0 ? `(${totalCards})` : ''}
+          </button>
+        )}
       </div>
+    </div>
 
       {/* ============ SETUP MODE ============ */}
       {!hasActive && (
@@ -484,6 +532,111 @@ export default function MainBingoMonitor() {
           )}
         </div>
       )}
+
+      {/* UPDATED: Reset Cards Confirmation Modal */}
+      {/* Updated Reset Cards Confirmation Modal */}
+{showResetConfirm && (
+  <div className="modal-overlay">
+    <div className="modal-card">
+      <h3 className="modal-title">🔧 Reset Cards Database</h3>
+      
+      <div className="modal-stats">
+        <div className="modal-stat">
+          <span>Cards in DB:</span>
+          <strong>{totalCards}</strong>
+        </div>
+        <div className="modal-stat">
+          <span>Players:</span>
+          <strong>{playerCount}</strong>
+        </div>
+        <div className="modal-stat">
+          <span>Revenue:</span>
+          <strong>{totalAmount.toLocaleString()} ETB</strong>
+        </div>
+      </div>
+
+      {totalCards === 0 && (
+        <div className="modal-info-banner">
+          ℹ️ No cards currently exist. This will still reset the database state.
+        </div>
+      )}
+
+      <div className="reset-mode-selector">
+        <label className="mode-label">Select Reset Operation:</label>
+        <div className="mode-options">
+          <button 
+            className={`mode-btn ${resetMode === 'clear' ? 'mode-active' : ''}`}
+            onClick={() => setResetMode('clear')}
+          >
+            <span className="mode-icon">🔄</span>
+            <div className="mode-info">
+              <strong>Clear All Cards</strong>
+              <span>Reset marked numbers to initial state</span>
+              <span className="mode-detail">Cards remain in DB, all marks cleared</span>
+            </div>
+          </button>
+          
+          <button 
+            className={`mode-btn ${resetMode === 'delete' ? 'mode-active' : ''}`}
+            onClick={() => setResetMode('delete')}
+          >
+            <span className="mode-icon">🗑️</span>
+            <div className="mode-info">
+              <strong>Delete All Cards</strong>
+              <span>Remove all cards from database</span>
+              <span className="mode-detail">Complete cleanup - fresh start</span>
+            </div>
+          </button>
+
+          <button 
+            className={`mode-btn ${resetMode === 'full-reset' ? 'mode-active' : ''}`}
+            onClick={() => setResetMode('full-reset')}
+          >
+            <span className="mode-icon">💣</span>
+            <div className="mode-info">
+              <strong>Full Database Reset</strong>
+              <span>Drop and recreate cards collection</span>
+              <span className="mode-detail">Complete reset including indexes (Debug)</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <div className="modal-warning-box">
+        <span className="warning-icon">⚠️</span>
+        <p>This is a destructive debug operation. All card data will be reset permanently.</p>
+      </div>
+
+      <div className="modal-actions">
+        <button 
+          onClick={() => {
+            setShowResetConfirm(false);
+            setResetMode('clear');
+          }} 
+          className="btn-cancel"
+          disabled={resetLoading}
+        >
+          Cancel
+        </button>
+        <button 
+          onClick={resetCards} 
+          className="btn-confirm-danger"
+          disabled={resetLoading}
+        >
+          {resetLoading ? (
+            <>⏳ Processing...</>
+          ) : (
+            <>
+              {resetMode === 'delete' && '🗑️ Delete All Cards'}
+              {resetMode === 'clear' && '🔄 Clear All Cards'}
+              {resetMode === 'full-reset' && '💣 Full Database Reset'}
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }
