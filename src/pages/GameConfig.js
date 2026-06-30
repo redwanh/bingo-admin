@@ -51,6 +51,8 @@ export default function GameConfig() {
     { key:'voiceEnabled', label:'Voice Announcements', trueLabel:'Enabled', falseLabel:'Disabled' },
     { key:'autoMarkDefault', label:'Auto-Mark Numbers (Default)', trueLabel:'Enabled', falseLabel:'Disabled' },
     { key:'isActive', label:'Game Active', trueLabel:'Active', falseLabel:'Inactive' },
+    { key:'autoGameActive', label:'Auto-Start New Games', trueLabel:'Auto', falseLabel:'Manual' },
+    { key:'isLastNumberCalledBingo', label:'Last Number Auto BINGO', trueLabel:'ON - Auto BINGO', falseLabel:'OFF' },
   ];
 
   return (
