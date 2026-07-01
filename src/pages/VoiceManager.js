@@ -38,6 +38,19 @@ export default function VoiceManager() {
       fetchVoices();
     } catch { toast.error('Failed'); }
   };
+  const generateAllTTS = async () => {
+  const confirmed = window.confirm('Generate spoken audio for all 75 numbers? Takes ~2 minutes.');
+  if (!confirmed) return;
+  try {
+    const headers = { Authorization: 'Bearer ' + localStorage.getItem('token') };
+    toast.success('Generating 75 TTS voices... please wait');
+    await axios.post(API + '/voice/generate-all', {}, { headers });
+    toast.success('All TTS voices generated!');
+    fetchVoices();
+  } catch (e) {
+    toast.error('Generation failed');
+  }
+};
 
   const startRecording = async (number, letter) => {
     try {
@@ -72,14 +85,23 @@ export default function VoiceManager() {
   const stopRecording = () => { if (mediaRecorderRef.current?.state === 'recording') { mediaRecorderRef.current.stop(); } };
   const speakTTS = (letter, number) => { if (window.speechSynthesis) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(letter + ' ' + number); u.volume = 0.8; u.rate = 0.9; window.speechSynthesis.speak(u); } };
 
-  const playVoice = async (number, letter) => {
-    const voice = voices.find(v => v.number === number);
-    if (voice?.audioData) { audioRef.current.src = voice.audioData; audioRef.current.play().catch(() => speakTTS(letter, number)); }
-    else if (voice?.audioUrl) { audioRef.current.src = voice.audioUrl; audioRef.current.play().catch(() => speakTTS(letter, number)); }
-    else { speakTTS(letter, number); }
-    setPlaying(number); setTimeout(() => setPlaying(null), 2000);
-  };
-
+ const playVoice = async (number, letter) => {
+  const voice = voices.find(v => v.number === number);
+  
+  if (voice?.audioData) {
+    audioRef.current.src = voice.audioData;
+    audioRef.current.play().catch(() => {});
+  } else if (voice?.audioUrl) {
+    audioRef.current.src = API.replace('/api', '') + voice.audioUrl;
+    audioRef.current.play().catch(() => {});
+  } else {
+    // Fallback — should not happen after generation
+    speakTTS(letter, number);
+  }
+  
+  setPlaying(number);
+  setTimeout(() => setPlaying(null), 2000);
+};
   if (loading) return <div style={{ textAlign:'center',padding:50 }}>Loading...</div>;
 
   return (
@@ -87,6 +109,16 @@ export default function VoiceManager() {
       <div style={{ display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10 }}>
         <h1>🔊 Voice Manager</h1>
         <button onClick={initVoices} style={{ padding:'10px 20px',background:'#FF4757',color:'#fff',border:'none',borderRadius:8,cursor:'pointer',fontWeight:700 }}>Init 75 Slots</button>
+      <button 
+  onClick={generateAllTTS} 
+  style={{ 
+    padding:'10px 20px', background:'#007AFF', color:'#fff',
+    border:'none', borderRadius:8, cursor:'pointer', fontWeight:700,
+    marginLeft: 10 
+  }}
+>
+  🔊 Generate All TTS
+</button>
       </div>
       <p style={{ color:'#888',fontSize:12,marginBottom:20 }}>🎙️ Click <b style={{ color:'#FF4757' }}>REC</b> to record, speak the number, click <b style={{ color:'#2ED573' }}>STOP</b> to save. Max 5 seconds.</p>
 
