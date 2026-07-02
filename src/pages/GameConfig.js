@@ -53,6 +53,7 @@ export default function GameConfig() {
     { key:'isActive', label:'Game Active', trueLabel:'Active', falseLabel:'Inactive' },
     { key:'autoGameActive', label:'Auto-Start New Games', trueLabel:'Auto', falseLabel:'Manual' },
     { key:'isLastNumberCalledBingo', label:'Last Number Auto BINGO', trueLabel:'ON - Auto BINGO', falseLabel:'OFF' },
+     { key:'autoBingoEnabled', label:'Auto BINGO (No Button Press)', trueLabel:'ON - Auto Win', falseLabel:'OFF - Manual' }, // 🔥 ADD THIS LINE
   ];
 
   return (
@@ -104,6 +105,7 @@ export default function GameConfig() {
           </div>
         ))}
       </div>
+      
 
       {/* Save button */}
       <button 
