@@ -87,8 +87,16 @@ export default function MainBingoRulesPage() {
     });
     setShowModal(true);
   };
-
-  const saveRule = async () => {
+const saveRule = async () => {
+    console.log('🟢 [SAVE] Form data:', {
+      name: form.name,
+      method: form.method,
+      patternsCount: form.patterns?.length,
+      patterns: form.patterns,
+      ruleConfigKeys: Object.keys(form.ruleConfig || {}).filter(k => k.startsWith('name') || k.startsWith('description')),
+      fullForm: JSON.stringify(form).substring(0, 200)
+    });
+    
     try {
       if (editingRule) {
         await axios.put(API + '/main-bingo-rules/' + editingRule._id, form, { headers: headers() });
@@ -99,9 +107,11 @@ export default function MainBingoRulesPage() {
       }
       setShowModal(false);
       fetchRules();
-    } catch (e) { toast.error(e.response?.data?.error || 'Save failed'); }
-  };
-
+    } catch (e) { 
+      console.error('❌ [SAVE] Error:', e.response?.data);
+      toast.error(e.response?.data?.error || 'Save failed'); 
+    }
+};
   const deleteRule = async (id) => {
     if (!window.confirm('Delete this rule?')) return;
     try {

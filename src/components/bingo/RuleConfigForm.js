@@ -52,6 +52,11 @@ const styles = {
     gridTemplateColumns: '1fr 1fr 1fr',
     gap: '10px',
   },
+  grid5: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(5, 1fr)',
+    gap: '8px',
+  },
   flex: {
     display: 'flex',
     gap: '15px',
@@ -155,7 +160,58 @@ const styles = {
     opacity: 0.5,
     cursor: 'not-allowed',
   },
+  langCard: {
+    marginBottom: 12,
+    padding: 12,
+    background: '#fff',
+    borderRadius: 8,
+    border: '1px solid #e5e7eb',
+  },
 };
+
+// Language names config with descriptions
+const langNames = [
+  { 
+    key: 'nameAmharic', 
+    descKey: 'descriptionAmharic',
+    label: 'አማርኛ (Amharic)', 
+    flag: '🇪🇹', 
+    placeholder: 'በአማርኛ የህግ ስም',
+    descPlaceholder: 'በአማርኛ መግለጫ'
+  },
+  { 
+    key: 'nameTigrinya', 
+    descKey: 'descriptionTigrinya',
+    label: 'ትግርኛ (Tigrinya)', 
+    flag: '🇪🇷', 
+    placeholder: 'ብትግርኛ ስም ሕጊ',
+    descPlaceholder: 'ብትግርኛ መግለጺ'
+  },
+  { 
+    key: 'nameOromo', 
+    descKey: 'descriptionOromo',
+    label: 'Afaan Oromo (Oromo)', 
+    flag: '🇪🇹', 
+    placeholder: 'Maqaa seeraa Afaan Oromoon',
+    descPlaceholder: 'Ibsa Afaan Oromoon'
+  },
+  { 
+    key: 'nameChinese', 
+    descKey: 'descriptionChinese',
+    label: '中文 (Chinese)', 
+    flag: '🇨🇳', 
+    placeholder: '规则名称（中文）',
+    descPlaceholder: '规则描述（中文）'
+  },
+  { 
+    key: 'nameEnglish', 
+    descKey: 'descriptionEnglish',
+    label: 'English', 
+    flag: '🇬🇧', 
+    placeholder: 'Rule name in English',
+    descPlaceholder: 'Rule description in English'
+  },
+];
 
 export default function RuleConfigForm({ config, onChange, patterns = [], method = 'rule' }) {
   const [newPatternName, setNewPatternName] = useState('');
@@ -178,6 +234,8 @@ export default function RuleConfigForm({ config, onChange, patterns = [], method
       topRow: false, bottomRow: false, leftColumn: false, rightColumn: false,
       centerRow: false, centerColumn: false, mainDiagonal: false, antiDiagonal: false
     },
+    nameAmharic: '', nameTigrinya: '', nameOromo: '', nameChinese: '', nameEnglish: '',
+    descriptionAmharic: '', descriptionTigrinya: '', descriptionOromo: '', descriptionChinese: '', descriptionEnglish: '',
     ...config
   };
   
@@ -254,14 +312,24 @@ export default function RuleConfigForm({ config, onChange, patterns = [], method
     });
   };
   
-  const addPattern = () => {
+ const addPattern = () => {
     if (!newPatternName || selectedCells.length === 0) return;
+    
+    console.log('🔵 [ADD PATTERN] Adding:', {
+      name: newPatternName,
+      cells: selectedCells,
+      currentPatterns: patterns.length
+    });
+    
     const updatedPatterns = [...patterns, { name: newPatternName, cells: [...selectedCells] }];
+    
+    console.log('🔵 [ADD PATTERN] Updated patterns:', updatedPatterns);
+    console.log('🔵 [ADD PATTERN] Calling onChange with patterns:', updatedPatterns.length);
+    
     onChange({ ...cfg, patterns: updatedPatterns });
     setNewPatternName('');
     setSelectedCells([]);
-  };
-  
+};
   const removePattern = (index) => {
     const updatedPatterns = patterns.filter((_, i) => i !== index);
     onChange({ ...cfg, patterns: updatedPatterns });
@@ -272,6 +340,41 @@ export default function RuleConfigForm({ config, onChange, patterns = [], method
   
   return (
     <div>
+      {/* 🔧 Multi-Language Rule Names & Descriptions */}
+      <div style={styles.section}>
+        <h4 style={styles.sectionTitle}>🌐 Multi-Language Names & Descriptions</h4>
+        <p style={{ fontSize: 11, color: '#6b7280', marginBottom: 12 }}>
+          Add rule name and description in different languages for players
+        </p>
+        {langNames.map(lang => (
+          <div key={lang.key} style={styles.langCard}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: '#1a1a2e', display: 'block', marginBottom: 8 }}>
+              {lang.flag} {lang.label}
+            </label>
+            <div style={styles.grid2}>
+              <div>
+                <label style={{ fontSize: 10, color: '#6b7280', display: 'block', marginBottom: 4 }}>Name</label>
+                <input 
+                  value={cfg[lang.key] || ''} 
+                  onChange={e => updateConfig(lang.key, e.target.value)}
+                  placeholder={lang.placeholder}
+                  style={styles.input}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: 10, color: '#6b7280', display: 'block', marginBottom: 4 }}>Description</label>
+                <input 
+                  value={cfg[lang.descKey] || ''} 
+                  onChange={e => updateConfig(lang.descKey, e.target.value)}
+                  placeholder={lang.descPlaceholder}
+                  style={styles.input}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Shape Presets */}
       <div style={styles.section}>
         <h4 style={styles.sectionTitle}>🎨 Shape Presets (Quick Setup)</h4>
@@ -594,6 +697,25 @@ export default function RuleConfigForm({ config, onChange, patterns = [], method
       <div style={{ ...styles.section, background: '#f9fafb' }}>
         <h4 style={{ ...styles.sectionTitle, color: '#6d28d9' }}>📋 Configuration Summary</h4>
         <div style={{ fontSize: 11, color: '#1a1a2e', lineHeight: 1.6 }}>
+          {/* Multi-language summary */}
+          {(cfg.nameAmharic || cfg.nameEnglish || cfg.descriptionAmharic || cfg.descriptionEnglish) && (
+            <div style={{ marginBottom: 8, padding: '8px 10px', background: '#fff', borderRadius: 6, border: '1px solid #e5e7eb' }}>
+              <b>🌐 Names:</b>{' '}
+              {cfg.nameAmharic && `🇪🇹 ${cfg.nameAmharic}`}
+              {cfg.nameTigrinya && ` | 🇪🇷 ${cfg.nameTigrinya}`}
+              {cfg.nameOromo && ` | ${cfg.nameOromo}`}
+              {cfg.nameChinese && ` | 🇨🇳 ${cfg.nameChinese}`}
+              {cfg.nameEnglish && ` | 🇬🇧 ${cfg.nameEnglish}`}
+              {(cfg.descriptionAmharic || cfg.descriptionEnglish) && (
+                <div style={{ marginTop: 4, fontSize: 10, color: '#6b7280' }}>
+                  <b>📝 Descriptions:</b>{' '}
+                  {cfg.descriptionAmharic && `🇪🇹 ${cfg.descriptionAmharic.substring(0, 30)}...`}
+                  {cfg.descriptionEnglish && ` | 🇬🇧 ${cfg.descriptionEnglish.substring(0, 30)}...`}
+                </div>
+              )}
+            </div>
+          )}
+          
           {method === 'rule' ? (
             <>
               <div>🎯 Lines to win: <b>{cfg.linesToWin}</b></div>
