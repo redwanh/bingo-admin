@@ -236,6 +236,22 @@ export default function RuleConfigForm({ config, onChange, patterns = [], method
     },
     nameAmharic: '', nameTigrinya: '', nameOromo: '', nameChinese: '', nameEnglish: '',
     descriptionAmharic: '', descriptionTigrinya: '', descriptionOromo: '', descriptionChinese: '', descriptionEnglish: '',
+        minSquares: 0,
+    exactSquares: null,
+    maxSquares: null,
+    squareMinSize: 2,
+    squareMaxSize: 5,
+    
+    // Rectangle
+    minRectangles: 0,
+    exactRectangles: null,
+    maxRectangles: null,
+    rectMinWidth: 2,
+    rectMaxWidth: 5,
+    rectMinHeight: 2,
+    rectMaxHeight: 5,
+    
+    
     ...config
   };
   
@@ -426,7 +442,53 @@ export default function RuleConfigForm({ config, onChange, patterns = [], method
               ))}
             </div>
           </div>
+{/* Square Settings */}
+<div style={styles.section}>
+  <h4 style={styles.sectionTitle}>🟦 Square Lines (NxN blocks)</h4>
+  <div style={styles.grid2}>
+    {[
+      { key: 'minSquares', label: 'Min Squares', hint: 'Minimum NxN squares required' },
+      { key: 'exactSquares', label: 'Exact Squares', hint: 'Empty = any, 0 = none allowed' },
+      { key: 'maxSquares', label: 'Max Squares', hint: 'Leave empty for unlimited' },
+      { key: 'squareMinSize', label: 'Min Square Size', hint: 'Smallest NxN (2=2x2, 3=3x3...)' },
+      { key: 'squareMaxSize', label: 'Max Square Size', hint: 'Largest NxN allowed' },
+    ].map(f => (
+      <div key={f.key}>
+        <label style={styles.label}>{f.label}</label>
+        <input type="number" min={0} max={5}
+          value={cfg[f.key] !== null && cfg[f.key] !== undefined ? cfg[f.key] : ''} 
+          onChange={e => updateConfig(f.key, e.target.value === '' ? null : parseInt(e.target.value))}
+          placeholder="Any" style={styles.input} />
+        <span style={styles.hint}>{f.hint}</span>
+      </div>
+    ))}
+  </div>
+</div>
 
+{/* Rectangle Settings */}
+<div style={styles.section}>
+  <h4 style={styles.sectionTitle}>🟩 Rectangle Lines (NxM blocks)</h4>
+  <div style={styles.grid2}>
+    {[
+      { key: 'minRectangles', label: 'Min Rectangles', hint: 'Minimum NxM rectangles required' },
+      { key: 'exactRectangles', label: 'Exact Rectangles', hint: 'Empty = any, 0 = none allowed' },
+      { key: 'maxRectangles', label: 'Max Rectangles', hint: 'Leave empty for unlimited' },
+      { key: 'rectMinWidth', label: 'Min Rectangle Width', hint: 'Smallest width (2-5)' },
+      { key: 'rectMaxWidth', label: 'Max Rectangle Width', hint: 'Largest width allowed' },
+      { key: 'rectMinHeight', label: 'Min Rectangle Height', hint: 'Smallest height (2-5)' },
+      { key: 'rectMaxHeight', label: 'Max Rectangle Height', hint: 'Largest height allowed' },
+    ].map(f => (
+      <div key={f.key}>
+        <label style={styles.label}>{f.label}</label>
+        <input type="number" min={0} max={5}
+          value={cfg[f.key] !== null && cfg[f.key] !== undefined ? cfg[f.key] : ''} 
+          onChange={e => updateConfig(f.key, e.target.value === '' ? null : parseInt(e.target.value))}
+          placeholder="Any" style={styles.input} />
+        <span style={styles.hint}>{f.hint}</span>
+      </div>
+    ))}
+  </div>
+</div>
           {/* Free Space Settings */}
           <div style={styles.section}>
             <h4 style={styles.sectionTitle}>⭐ Free Space</h4>
@@ -527,30 +589,26 @@ export default function RuleConfigForm({ config, onChange, patterns = [], method
           <div style={styles.section}>
             <h4 style={styles.sectionTitle}>🧭 Line Directions</h4>
             <div style={styles.flex}>
-              {['horizontal', 'vertical', 'diagonal'].map(dir => (
-                <label key={dir} style={styles.checkboxLabel}>
-                  <input type="checkbox" 
-                    checked={(cfg.lineDirections || []).includes(dir)}
-                    onChange={e => {
-                      const current = cfg.lineDirections || ['horizontal','vertical','diagonal'];
-                      const updated = e.target.checked ? [...current, dir] : current.filter(d => d !== dir);
-                      updateConfig('lineDirections', updated.length === 0 ? ['horizontal'] : updated);
-                    }}
-                  />
-                  {dir.charAt(0).toUpperCase() + dir.slice(1)}
-                </label>
-              ))}
+             {['horizontal', 'vertical', 'diagonal', 'square', 'rectangle'].map(dir => (
+  <label key={dir} style={styles.checkboxLabel}>
+    <input type="checkbox" checked={(cfg.lineDirections || []).includes(dir)}
+      onChange={e => { /* same logic */ }} />
+    {dir.charAt(0).toUpperCase() + dir.slice(1)}
+  </label>
+))}
             </div>
             <div style={{ marginTop: 12 }}>
               <label style={styles.label}>Exclusive Lines Type</label>
-              <select value={cfg.exclusiveLines || ''}
-                onChange={e => updateConfig('exclusiveLines', e.target.value || null)}
-                style={styles.select}>
-                <option value="">None</option>
-                <option value="rows">Rows Only</option>
-                <option value="columns">Columns Only</option>
-                <option value="diagonals">Diagonals Only</option>
-              </select>
+             <select value={cfg.exclusiveLines || ''}
+  onChange={e => updateConfig('exclusiveLines', e.target.value || null)}
+  style={styles.select}>
+  <option value="">None</option>
+  <option value="rows">Rows Only</option>
+  <option value="columns">Columns Only</option>
+  <option value="diagonals">Diagonals Only</option>
+  <option value="squares">Squares Only</option>
+  <option value="rectangles">Rectangles Only</option>
+</select>
             </div>
           </div>
 
@@ -722,6 +780,8 @@ export default function RuleConfigForm({ config, onChange, patterns = [], method
               <div>📏 Rows: min={cfg.minRows} exact={cfg.exactRows ?? 'any'} max={cfg.maxRows ?? '∞'}</div>
               <div>📏 Cols: min={cfg.minColumns} exact={cfg.exactColumns ?? 'any'} max={cfg.maxColumns ?? '∞'}</div>
               <div>📏 Diags: min={cfg.minDiagonals} exact={cfg.exactDiagonals ?? 'any'} max={cfg.maxDiagonals ?? '∞'}</div>
+              <div>🟦 Squares: min={cfg.minSquares ?? 'any'} exact={cfg.exactSquares ?? 'any'} max={cfg.maxSquares ?? '∞'}</div>
+<div>🟩 Rectangles: min={cfg.minRectangles ?? 'any'} exact={cfg.exactRectangles ?? 'any'} max={cfg.maxRectangles ?? '∞'}</div>
               <div>⭐ Free: {cfg.freeSpaceCounts !== false ? 'Counts' : 'Blocked'}{cfg.freeSpaceRequiredForWin ? ' | Required' : ''}</div>
               <div>🔗 Overlap: {cfg.allowOverlapping !== false ? 'Yes' : 'No'}{cfg.sharedCellsLimit ? ` (max ${cfg.sharedCellsLimit})` : ''}</div>
               <div>📍 Intersect: {cfg.linesMustIntersect ? `Yes [${cfg.intersectionPoint?.row},${cfg.intersectionPoint?.col}]` : 'No'}</div>

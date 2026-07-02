@@ -22,7 +22,7 @@ const defaultRuleConfig = {
   freeSpaceBlocked: false, freeSpaceCountsForLines: true,
   allowOverlapping: true, requireUniqueLines: false,
   sharedCellsLimit: null,
-  lineDirections: ['horizontal', 'vertical', 'diagonal'],
+  lineDirections: ['horizontal', 'vertical', 'diagonal', 'square', 'rectangle'],
   requiredDirections: [], prohibitedDirections: [],
   cornersRequired: false, minCellsMarked: null,
   specificLines: {
