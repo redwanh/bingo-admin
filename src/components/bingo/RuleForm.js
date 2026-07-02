@@ -25,6 +25,8 @@ const styles = {
     overflowY: 'auto',
     border: '2px solid #000000',
     boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+    position: 'relative',
+    zIndex: 201,
   },
   title: {
     margin: '0 0 20px 0',
@@ -49,7 +51,7 @@ const styles = {
     borderRadius: '8px',
     fontSize: '14px',
     outline: 'none',
-    transition: 'border-color 0.2s',
+    boxSizing: 'border-box',
   },
   select: {
     width: '100%',
@@ -60,6 +62,7 @@ const styles = {
     borderRadius: '8px',
     fontSize: '14px',
     outline: 'none',
+    boxSizing: 'border-box',
   },
   saveBtn: {
     width: '100%',
@@ -74,13 +77,42 @@ const styles = {
     fontSize: '15px',
     boxShadow: '0 4px 16px rgba(212,175,55,0.25)',
     transition: 'all 0.3s ease',
+    position: 'relative',
+    zIndex: 202,
+  },
+  closeBtn: {
+    position: 'absolute',
+    top: '12px',
+    right: '12px',
+    width: '32px',
+    height: '32px',
+    borderRadius: '50%',
+    border: '2px solid #e5e7eb',
+    background: '#fff',
+    color: '#6b7280',
+    fontSize: '16px',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 203,
   },
 };
 
 export default function RuleForm({ editingRule, form, onChange, onSave, onClose }) {
+  const handleSave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('💾 [SAVE] Button clicked');
+    onSave();
+  };
+
   return (
     <div style={styles.overlay} onClick={onClose}>
       <div style={styles.modal} onClick={e => e.stopPropagation()}>
+        
+        {/* Close button */}
+        <button style={styles.closeBtn} onClick={onClose}>✕</button>
         
         <h2 style={styles.title}>
           {editingRule ? '✎ Edit Rule' : '✨ Create New Rule'}
@@ -88,7 +120,7 @@ export default function RuleForm({ editingRule, form, onChange, onSave, onClose 
         
         <label style={styles.label}>Rule Name *</label>
         <input 
-          value={form.name} 
+          value={form.name || ''} 
           onChange={e => onChange({ ...form, name: e.target.value })} 
           placeholder="e.g., Triple Bingo" 
           style={styles.input} 
@@ -96,7 +128,7 @@ export default function RuleForm({ editingRule, form, onChange, onSave, onClose 
         
         <label style={styles.label}>Description</label>
         <input 
-          value={form.description} 
+          value={form.description || ''} 
           onChange={e => onChange({ ...form, description: e.target.value })} 
           placeholder="Describe this rule..." 
           style={styles.input} 
@@ -104,7 +136,7 @@ export default function RuleForm({ editingRule, form, onChange, onSave, onClose 
         
         <label style={styles.label}>Method</label>
         <select 
-          value={form.method} 
+          value={form.method || 'rule'} 
           onChange={e => onChange({ ...form, method: e.target.value })} 
           style={styles.select}
         >
@@ -113,21 +145,20 @@ export default function RuleForm({ editingRule, form, onChange, onSave, onClose 
         </select>
         
         <RuleConfigForm 
-          config={form.ruleConfig}
-          onChange={(newConfig) => {
-            // Extract patterns from config and save at form level
-            const { patterns: configPatterns, ...ruleConfigOnly } = newConfig;
-            onChange({ 
-              ...form, 
-              ruleConfig: ruleConfigOnly,
-              patterns: configPatterns || form.patterns || []
-            });
-          }}
-          patterns={form.patterns || []}
-          method={form.method}
-        />
+  config={form.ruleConfig || {}}
+  onChange={(newConfig) => {
+    // Just pass everything through - let the parent handle it
+    onChange({ 
+      ...form, 
+      ruleConfig: newConfig,
+      patterns: newConfig.patterns || form.patterns || []
+    });
+  }}
+  patterns={form.patterns || []}
+  method={form.method || 'rule'}
+/>
         
-        <button onClick={onSave} style={styles.saveBtn}>
+        <button onClick={handleSave} style={styles.saveBtn}>
           💾 {editingRule ? 'Update Rule' : 'Create Rule'}
         </button>
       </div>
