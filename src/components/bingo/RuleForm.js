@@ -112,29 +112,21 @@ export default function RuleForm({ editingRule, form, onChange, onSave, onClose 
           <option value="pattern">Pattern-Based</option>
         </select>
         
-<RuleConfigForm 
-  config={form.ruleConfig}
-  onChange={(newConfig) => {
-    console.log('🟡 [RULE FORM] onChange received:', {
-      hasPatterns: !!newConfig.patterns,
-      patternsCount: newConfig.patterns?.length,
-      keys: Object.keys(newConfig).filter(k => k.startsWith('name') || k.startsWith('description') || k === 'patterns')
-    });
-    
-    const { patterns: configPatterns, ...ruleConfigOnly } = newConfig;
-    const allPatterns = configPatterns || form.patterns || [];
-    
-    console.log('🟡 [RULE FORM] Extracted patterns:', allPatterns.length);
-    
-    onChange({ 
-      ...form, 
-      ruleConfig: ruleConfigOnly,
-      patterns: allPatterns
-    });
-  }}
-  patterns={form.patterns || []}
-  method={form.method}
-/>    
+        <RuleConfigForm 
+          config={form.ruleConfig}
+          onChange={(newConfig) => {
+            // Extract patterns from config and save at form level
+            const { patterns: configPatterns, ...ruleConfigOnly } = newConfig;
+            onChange({ 
+              ...form, 
+              ruleConfig: ruleConfigOnly,
+              patterns: configPatterns || form.patterns || []
+            });
+          }}
+          patterns={form.patterns || []}
+          method={form.method}
+        />
+        
         <button onClick={onSave} style={styles.saveBtn}>
           💾 {editingRule ? 'Update Rule' : 'Create Rule'}
         </button>
