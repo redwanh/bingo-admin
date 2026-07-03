@@ -14,27 +14,26 @@ const defaultRuleConfig = {
   linesToWin: 1, minRows: 0, minColumns: 0, minDiagonals: 0,
   exactRows: null, exactColumns: null, exactDiagonals: null,
   maxRows: null, maxColumns: null, maxDiagonals: null,
-  requiredCombination: { rows: null, columns: null, diagonals: null },
+  minSquares: 0, exactSquares: null, maxSquares: null, squareSize: 2,
+  minRectangles: 0, exactRectangles: null, maxRectangles: null, rectWidth: 3, rectHeight: 2,
+  requiredCombination: { rows: null, columns: null, diagonals: null, squares: null, rectangles: null },
   mustHaveAllTypes: false, exclusiveLines: null,
   linesMustIntersect: false, linesMustNotIntersect: false,
   intersectionPoint: { row: 2, col: 2 },
-  freeSpaceCounts: true, freeSpaceRequiredForWin: false,
-  freeSpaceBlocked: false, freeSpaceCountsForLines: true,
-  allowOverlapping: true, requireUniqueLines: false,
-  sharedCellsLimit: null,
+  freeSpaceCounts: true, freeSpaceRequiredForWin: false, freeSpaceBlocked: false,
+  allowOverlapping: true, requireUniqueLines: false, sharedCellsLimit: null,
   lineDirections: ['horizontal', 'vertical', 'diagonal', 'square', 'rectangle'],
   requiredDirections: [], prohibitedDirections: [],
   cornersRequired: false, minCellsMarked: null,
-  specificLines: {
-    topRow: false, bottomRow: false, leftColumn: false, rightColumn: false,
-    centerRow: false, centerColumn: false, mainDiagonal: false, antiDiagonal: false
-  }
+  specificLines: { topRow: false, bottomRow: false, leftColumn: false, rightColumn: false, centerRow: false, centerColumn: false, mainDiagonal: false, antiDiagonal: false }
 };
 
 const defaultForm = {
   name: '', description: '', method: 'rule',
   ruleConfig: { ...defaultRuleConfig },
-  patterns: []
+  patterns: [],
+  nameAmharic: '', nameTigrinya: '', nameOromo: '', nameChinese: '', nameEnglish: '',
+  descriptionAmharic: '', descriptionTigrinya: '', descriptionOromo: '', descriptionChinese: '', descriptionEnglish: '',
 };
 
 export default function MainBingoRulesPage() {
@@ -44,13 +43,9 @@ export default function MainBingoRulesPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingRule, setEditingRule] = useState(null);
   const [form, setForm] = useState({ ...defaultForm });
-  
-  // Test state
   const [testRule, setTestRule] = useState(null);
   const [testCells, setTestCells] = useState([]);
   const [testResult, setTestResult] = useState(null);
-  
-  // Samples state
   const [showSamples, setShowSamples] = useState(false);
   const [viewRule, setViewRule] = useState(null);
   const [samples, setSamples] = useState({ wins: [], losses: [] });
@@ -67,9 +62,6 @@ export default function MainBingoRulesPage() {
     setLoading(false);
   };
 
-  // ============================================
-  // CRUD OPERATIONS
-  // ============================================
   const openCreate = () => {
     setEditingRule(null);
     setForm({ ...defaultForm, ruleConfig: { ...defaultRuleConfig } });
@@ -79,24 +71,20 @@ export default function MainBingoRulesPage() {
   const openEdit = (rule) => {
     setEditingRule(rule);
     setForm({
-      name: rule.name,
+      name: rule.name || '',
       description: rule.description || '',
-      method: rule.method,
-      ruleConfig: { ...defaultRuleConfig, ...rule.ruleConfig },
-      patterns: rule.patterns || []
+      method: rule.method || 'rule',
+      ruleConfig: { ...defaultRuleConfig, ...(rule.ruleConfig || {}) },
+      patterns: rule.patterns || [],
+      nameAmharic: rule.nameAmharic || '', nameTigrinya: rule.nameTigrinya || '',
+      nameOromo: rule.nameOromo || '', nameChinese: rule.nameChinese || '', nameEnglish: rule.nameEnglish || '',
+      descriptionAmharic: rule.descriptionAmharic || '', descriptionTigrinya: rule.descriptionTigrinya || '',
+      descriptionOromo: rule.descriptionOromo || '', descriptionChinese: rule.descriptionChinese || '', descriptionEnglish: rule.descriptionEnglish || '',
     });
     setShowModal(true);
   };
-const saveRule = async () => {
-    console.log('🟢 [SAVE] Form data:', {
-      name: form.name,
-      method: form.method,
-      patternsCount: form.patterns?.length,
-      patterns: form.patterns,
-      ruleConfigKeys: Object.keys(form.ruleConfig || {}).filter(k => k.startsWith('name') || k.startsWith('description')),
-      fullForm: JSON.stringify(form).substring(0, 200)
-    });
-    
+
+  const saveRule = async () => {
     try {
       if (editingRule) {
         await axios.put(API + '/main-bingo-rules/' + editingRule._id, form, { headers: headers() });
@@ -107,35 +95,23 @@ const saveRule = async () => {
       }
       setShowModal(false);
       fetchRules();
-    } catch (e) { 
-      console.error('❌ [SAVE] Error:', e.response?.data);
-      toast.error(e.response?.data?.error || 'Save failed'); 
-    }
-};
+    } catch (e) { toast.error(e.response?.data?.error || 'Save failed'); }
+  };
+
   const deleteRule = async (id) => {
     if (!window.confirm('Delete this rule?')) return;
     try {
       await axios.delete(API + '/main-bingo-rules/' + id, { headers: headers() });
-      toast.success('Deleted!');
-      fetchRules();
+      toast.success('Deleted!'); fetchRules();
     } catch { toast.error('Delete failed'); }
   };
 
-  // ============================================
-  // TEST OPERATIONS
-  // ============================================
-  const openTest = (rule) => {
-    setTestRule(rule);
-    setTestCells([]);
-    setTestResult(null);
-  };
+  const openTest = (rule) => { setTestRule(rule); setTestCells([]); setTestResult(null); };
+
   const deleteSample = async (type, index) => {
     if (!window.confirm('Delete this sample?')) return;
     try {
-      await axios.delete(
-        API + '/main-bingo-rules/' + viewRule._id + '/samples/' + type + '/' + index,
-        { headers: headers() }
-      );
+      await axios.delete(API + '/main-bingo-rules/' + viewRule._id + '/samples/' + type + '/' + index, { headers: headers() });
       toast.success('Sample deleted!');
       const res = await axios.get(API + '/main-bingo-rules/' + viewRule._id + '/samples', { headers: headers() });
       setSamples(res.data.samples || { wins: [], losses: [] });
@@ -145,23 +121,15 @@ const saveRule = async () => {
   const toggleTestCell = (row, col) => {
     setTestCells(prev => {
       const exists = prev.find(c => c[0] === row && c[1] === col);
-      if (exists) return prev.filter(c => !(c[0] === row && c[1] === col));
-      return [...prev, [row, col]];
+      return exists ? prev.filter(c => !(c[0] === row && c[1] === col)) : [...prev, [row, col]];
     });
     setTestResult(null);
   };
 
   const runTest = async () => {
-    if (!testRule || testCells.length === 0) {
-      toast.error('Please mark some cells first');
-      return;
-    }
+    if (!testRule || testCells.length === 0) { toast.error('Please mark some cells first'); return; }
     try {
-      const res = await axios.post(
-        API + '/main-bingo-rules/' + testRule._id + '/test',
-        { markedCells: testCells },
-        { headers: headers() }
-      );
+      const res = await axios.post(API + '/main-bingo-rules/' + testRule._id + '/test', { markedCells: testCells }, { headers: headers() });
       setTestResult(res.data.result);
     } catch { toast.error('Test failed'); }
   };
@@ -169,230 +137,52 @@ const saveRule = async () => {
   const saveAsSample = async (type) => {
     if (!testResult) return;
     try {
-      await axios.post(
-        API + '/main-bingo-rules/' + testRule._id + '/samples',
-        {
-          type,
-          sample: {
-            markedCells: testCells,
-            isValid: testResult.valid,
-            details: testResult.details || {}
-          }
-        },
-        { headers: headers() }
-      );
-      toast.success(`Saved as ${type} sample! 🎉`);
-      fetchRules();
-    } catch (e) {
-      toast.error(e.response?.data?.error || 'Failed to save sample');
-    }
+      await axios.post(API + '/main-bingo-rules/' + testRule._id + '/samples', { type, sample: { markedCells: testCells, isValid: testResult.valid, details: testResult.details || {} } }, { headers: headers() });
+      toast.success(`Saved as ${type} sample! 🎉`); fetchRules();
+    } catch (e) { toast.error(e.response?.data?.error || 'Failed to save sample'); }
   };
 
-  // ============================================
-  // SAMPLES OPERATIONS
-  // ============================================
   const openSamples = async (rule) => {
     setViewRule(rule);
     try {
-      const res = await axios.get(
-        API + '/main-bingo-rules/' + rule._id + '/samples',
-        { headers: headers() }
-      );
+      const res = await axios.get(API + '/main-bingo-rules/' + rule._id + '/samples', { headers: headers() });
       setSamples(res.data.samples || { wins: [], losses: [] });
-    } catch {
-      setSamples({ wins: [], losses: [] });
-      toast.error('Failed to load samples');
-    }
+    } catch { setSamples({ wins: [], losses: [] }); toast.error('Failed to load samples'); }
     setShowSamples(true);
   };
 
-  if (loading) return (
-    <div style={styles.loadingContainer}>
-      <div style={styles.loadingSpinner}></div>
-      <p style={styles.loadingText}>Loading rules...</p>
-    </div>
-  );
+  if (loading) return <div style={{ textAlign: 'center', padding: 80, color: '#1a1a1a', fontSize: 18, fontWeight: 600 }}>⏳ Loading...</div>;
 
   return (
-    <div style={styles.container}>
-      {/* Header */}
-      <div style={styles.header}>
+    <div style={{ padding: '4px 0', maxWidth: '1400px', margin: '0 auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <h1 style={styles.title}>🎯 Main Bingo Rules</h1>
-          <p style={styles.subtitle}>Manage winning conditions and test them</p>
+          <h1 style={{ fontSize: 28, fontWeight: 700, color: '#1a1a2e', margin: 0 }}>🎯 Main Bingo Rules</h1>
+          <p style={{ fontSize: 14, color: '#6b7280', margin: '4px 0 0' }}>Manage winning conditions and test them</p>
         </div>
-        <button onClick={openCreate} style={styles.createBtn}>
-          + Create New Rule
-        </button>
+        <button onClick={openCreate} style={{ padding: '12px 28px', background: 'linear-gradient(135deg, #d4af37, #b8962f)', color: '#fff', border: '2px solid #000', borderRadius: 10, cursor: 'pointer', fontWeight: 700, fontSize: 14 }}>+ Create New Rule</button>
       </div>
 
-      {/* Scheduled Games Section */}
-      <div style={styles.scheduledSection}>
+      <div style={{ background: '#fff', border: '2px solid #000', borderRadius: 14, padding: 20, marginBottom: 24 }}>
         <ScheduledGames />
       </div>
 
-      {/* Rules Grid */}
       {rules.length === 0 && (
-        <div style={styles.emptyState}>
-          <div style={styles.emptyIcon}>🎱</div>
-          <p style={styles.emptyText}>No rules yet. Create your first rule!</p>
+        <div style={{ textAlign: 'center', padding: 60, background: '#fff', border: '2px solid #000', borderRadius: 14 }}>
+          <p style={{ fontSize: 48 }}>🎱</p>
+          <p style={{ color: '#6b7280', fontSize: 16 }}>No rules yet. Create your first rule!</p>
         </div>
       )}
-      
-      <div style={styles.grid}>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: 20 }}>
         {rules.map(rule => (
-          <RuleCard
-            key={rule._id}
-            rule={rule}
-            onEdit={() => openEdit(rule)}
-            onTest={() => openTest(rule)}
-            onSamples={() => openSamples(rule)}
-            onDelete={() => deleteRule(rule._id)}
-          />
+          <RuleCard key={rule._id} rule={rule} onEdit={() => openEdit(rule)} onTest={() => openTest(rule)} onSamples={() => openSamples(rule)} onDelete={() => deleteRule(rule._id)} />
         ))}
       </div>
 
-      {/* Create/Edit Modal */}
-      {showModal && (
-        <RuleForm
-          editingRule={editingRule}
-          form={form}
-          onChange={setForm}
-          onSave={saveRule}
-          onClose={() => setShowModal(false)}
-        />
-      )}
-
-      {/* Test Modal */}
-      {testRule && (
-        <TestModal
-          rule={testRule}
-          testCells={testCells}
-          testResult={testResult}
-          onCellClick={toggleTestCell}
-          onTest={runTest}
-          onSaveSample={saveAsSample}
-          onClose={() => setTestRule(null)}
-        />
-      )}
-
-      {/* Samples Modal */}
-      {showSamples && viewRule && (
-        <SamplesModal
-          rule={viewRule}
-          samples={samples}
-          onClose={() => setShowSamples(false)}
-          onDeleteSample={deleteSample} 
-        />
-      )}
+      {showModal && <RuleForm editingRule={editingRule} form={form} onChange={setForm} onSave={saveRule} onClose={() => setShowModal(false)} />}
+      {testRule && <TestModal rule={testRule} testCells={testCells} testResult={testResult} onCellClick={toggleTestCell} onTest={runTest} onSaveSample={saveAsSample} onClose={() => setTestRule(null)} />}
+      {showSamples && viewRule && <SamplesModal rule={viewRule} samples={samples} onClose={() => setShowSamples(false)} onDeleteSample={deleteSample} />}
     </div>
   );
 }
-
-// ============================================
-// STYLES - White/Gold/Black Theme
-// ============================================
-const styles = {
-  container: {
-    padding: '4px 0',
-    maxWidth: '1400px',
-    margin: '0 auto',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '24px',
-    flexWrap: 'wrap',
-    gap: '16px',
-  },
-  title: {
-    fontSize: '28px',
-    fontWeight: 700,
-    color: '#1a1a2e',
-    margin: 0,
-    letterSpacing: '-0.5px',
-  },
-  subtitle: {
-    fontSize: '14px',
-    color: '#6b7280',
-    margin: '4px 0 0 0',
-  },
-  createBtn: {
-    padding: '12px 28px',
-    background: 'linear-gradient(135deg, #d4af37, #b8962f)',
-    color: '#fff',
-    border: '2px solid #000000',
-    borderRadius: '10px',
-    cursor: 'pointer',
-    fontWeight: 700,
-    fontSize: '14px',
-    boxShadow: '0 4px 16px rgba(212,175,55,0.25)',
-    transition: 'all 0.3s ease',
-    letterSpacing: '0.3px',
-  },
-  scheduledSection: {
-    background: '#ffffff',
-    border: '2px solid #000000',
-    borderRadius: '14px',
-    padding: '20px',
-    marginBottom: '24px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-  },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))',
-    gap: '20px',
-  },
-  emptyState: {
-    textAlign: 'center',
-    padding: '60px',
-    background: '#ffffff',
-    border: '2px solid #000000',
-    borderRadius: '14px',
-  },
-  emptyIcon: {
-    fontSize: '48px',
-    marginBottom: '16px',
-  },
-  emptyText: {
-    color: '#6b7280',
-    fontSize: '16px',
-    margin: 0,
-  },
-  loadingContainer: {
-    textAlign: 'center',
-    padding: '50px',
-    background: '#ffffff',
-    border: '2px solid #000000',
-    borderRadius: '14px',
-  },
-  loadingSpinner: {
-    width: '40px',
-    height: '40px',
-    border: '3px solid #e5e7eb',
-    borderTop: '3px solid #d4af37',
-    borderRadius: '50%',
-    animation: 'spin 0.8s linear infinite',
-    margin: '0 auto 12px',
-  },
-  loadingText: {
-    color: '#6b7280',
-    fontSize: '14px',
-    margin: 0,
-  },
-};
-
-// Add keyframe animation for spinner
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  .create-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(212,175,55,0.3);
-  }
-`;
-document.head.appendChild(style);

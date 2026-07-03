@@ -25,8 +25,6 @@ const styles = {
     overflowY: 'auto',
     border: '2px solid #000000',
     boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
-    position: 'relative',
-    zIndex: 201,
   },
   title: {
     margin: '0 0 20px 0',
@@ -51,7 +49,7 @@ const styles = {
     borderRadius: '8px',
     fontSize: '14px',
     outline: 'none',
-    boxSizing: 'border-box',
+    transition: 'border-color 0.2s',
   },
   select: {
     width: '100%',
@@ -62,7 +60,6 @@ const styles = {
     borderRadius: '8px',
     fontSize: '14px',
     outline: 'none',
-    boxSizing: 'border-box',
   },
   saveBtn: {
     width: '100%',
@@ -77,42 +74,42 @@ const styles = {
     fontSize: '15px',
     boxShadow: '0 4px 16px rgba(212,175,55,0.25)',
     transition: 'all 0.3s ease',
-    position: 'relative',
-    zIndex: 202,
-  },
-  closeBtn: {
-    position: 'absolute',
-    top: '12px',
-    right: '12px',
-    width: '32px',
-    height: '32px',
-    borderRadius: '50%',
-    border: '2px solid #e5e7eb',
-    background: '#fff',
-    color: '#6b7280',
-    fontSize: '16px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 203,
   },
 };
 
 export default function RuleForm({ editingRule, form, onChange, onSave, onClose }) {
-  const handleSave = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log('💾 [SAVE] Button clicked');
-    onSave();
+  
+  // Handler to split multi-language fields from ruleConfig
+  const handleConfigChange = (newConfig) => {
+    // Extract multi-language fields
+    const {
+      nameAmharic, nameTigrinya, nameOromo, nameChinese, nameEnglish,
+      descriptionAmharic, descriptionTigrinya, descriptionOromo, 
+      descriptionChinese, descriptionEnglish,
+      ...ruleConfigOnly
+    } = newConfig;
+
+    onChange({
+      ...form,
+      // Save language fields at form level (where API expects them)
+      nameAmharic: nameAmharic || '',
+      nameTigrinya: nameTigrinya || '',
+      nameOromo: nameOromo || '',
+      nameChinese: nameChinese || '',
+      nameEnglish: nameEnglish || '',
+      descriptionAmharic: descriptionAmharic || '',
+      descriptionTigrinya: descriptionTigrinya || '',
+      descriptionOromo: descriptionOromo || '',
+      descriptionChinese: descriptionChinese || '',
+      descriptionEnglish: descriptionEnglish || '',
+      // Save only the actual rule config without language fields
+      ruleConfig: ruleConfigOnly,
+    });
   };
 
   return (
     <div style={styles.overlay} onClick={onClose}>
       <div style={styles.modal} onClick={e => e.stopPropagation()}>
-        
-        {/* Close button */}
-        <button style={styles.closeBtn} onClick={onClose}>✕</button>
         
         <h2 style={styles.title}>
           {editingRule ? '✎ Edit Rule' : '✨ Create New Rule'}
@@ -120,7 +117,7 @@ export default function RuleForm({ editingRule, form, onChange, onSave, onClose 
         
         <label style={styles.label}>Rule Name *</label>
         <input 
-          value={form.name || ''} 
+          value={form.name} 
           onChange={e => onChange({ ...form, name: e.target.value })} 
           placeholder="e.g., Triple Bingo" 
           style={styles.input} 
@@ -128,7 +125,7 @@ export default function RuleForm({ editingRule, form, onChange, onSave, onClose 
         
         <label style={styles.label}>Description</label>
         <input 
-          value={form.description || ''} 
+          value={form.description} 
           onChange={e => onChange({ ...form, description: e.target.value })} 
           placeholder="Describe this rule..." 
           style={styles.input} 
@@ -136,7 +133,7 @@ export default function RuleForm({ editingRule, form, onChange, onSave, onClose 
         
         <label style={styles.label}>Method</label>
         <select 
-          value={form.method || 'rule'} 
+          value={form.method} 
           onChange={e => onChange({ ...form, method: e.target.value })} 
           style={styles.select}
         >
@@ -145,20 +142,26 @@ export default function RuleForm({ editingRule, form, onChange, onSave, onClose 
         </select>
         
         <RuleConfigForm 
-  config={form.ruleConfig || {}}
-  onChange={(newConfig) => {
-    // Just pass everything through - let the parent handle it
-    onChange({ 
-      ...form, 
-      ruleConfig: newConfig,
-      patterns: newConfig.patterns || form.patterns || []
-    });
-  }}
-  patterns={form.patterns || []}
-  method={form.method || 'rule'}
-/>
+          config={{
+            ...form.ruleConfig,
+            // Pass language fields back into config so RuleConfigForm can edit them
+            nameAmharic: form.nameAmharic,
+            nameTigrinya: form.nameTigrinya,
+            nameOromo: form.nameOromo,
+            nameChinese: form.nameChinese,
+            nameEnglish: form.nameEnglish,
+            descriptionAmharic: form.descriptionAmharic,
+            descriptionTigrinya: form.descriptionTigrinya,
+            descriptionOromo: form.descriptionOromo,
+            descriptionChinese: form.descriptionChinese,
+            descriptionEnglish: form.descriptionEnglish,
+          }}
+          onChange={handleConfigChange}
+          patterns={form.patterns || []}
+          method={form.method}
+        />
         
-        <button onClick={handleSave} style={styles.saveBtn}>
+        <button onClick={onSave} style={styles.saveBtn}>
           💾 {editingRule ? 'Update Rule' : 'Create Rule'}
         </button>
       </div>
