@@ -24,14 +24,28 @@ const defaultRuleConfig = {
   allowOverlapping: true, requireUniqueLines: false, sharedCellsLimit: null,
   lineDirections: ['horizontal', 'vertical', 'diagonal', 'square', 'rectangle'],
   requiredDirections: [], prohibitedDirections: [],
-  cornersRequired: false, minCellsMarked: null,
+  cornersRequired: 0, minCellsMarked: null,
   specificLines: { topRow: false, bottomRow: false, leftColumn: false, rightColumn: false, centerRow: false, centerColumn: false, mainDiagonal: false, antiDiagonal: false }
+};
+
+const defaultMixedSubRule = {
+  type: 'count',
+  countConfig: {
+    linesToWin: 1, minRows: 0, minColumns: 0, minDiagonals: 0,
+    minSquares: 0, minRectangles: 0,
+    squareSize: 2, rectWidth: 3, rectHeight: 2,
+    lineDirections: ['horizontal', 'vertical', 'diagonal'],
+    allowOverlapping: true, freeSpaceCounts: true, cornersRequired: 0,
+  },
+  patternIndex: 0,
+  interception: 'canIntercept',
 };
 
 const defaultForm = {
   name: '', description: '', method: 'rule',
   ruleConfig: { ...defaultRuleConfig },
   patterns: [],
+  mixedRules: [],
   nameAmharic: '', nameTigrinya: '', nameOromo: '', nameChinese: '', nameEnglish: '',
   descriptionAmharic: '', descriptionTigrinya: '', descriptionOromo: '', descriptionChinese: '', descriptionEnglish: '',
 };
@@ -64,7 +78,12 @@ export default function MainBingoRulesPage() {
 
   const openCreate = () => {
     setEditingRule(null);
-    setForm({ ...defaultForm, ruleConfig: { ...defaultRuleConfig } });
+    setForm({ 
+      ...defaultForm, 
+      ruleConfig: { ...defaultRuleConfig },
+      patterns: [],
+      mixedRules: [],
+    });
     setShowModal(true);
   };
 
@@ -76,6 +95,7 @@ export default function MainBingoRulesPage() {
       method: rule.method || 'rule',
       ruleConfig: { ...defaultRuleConfig, ...(rule.ruleConfig || {}) },
       patterns: rule.patterns || [],
+      mixedRules: rule.mixedRules || [],
       nameAmharic: rule.nameAmharic || '', nameTigrinya: rule.nameTigrinya || '',
       nameOromo: rule.nameOromo || '', nameChinese: rule.nameChinese || '', nameEnglish: rule.nameEnglish || '',
       descriptionAmharic: rule.descriptionAmharic || '', descriptionTigrinya: rule.descriptionTigrinya || '',
@@ -86,16 +106,33 @@ export default function MainBingoRulesPage() {
 
   const saveRule = async () => {
     try {
+      // 🔧 Ensure name is set
+      const data = {
+        ...form,
+        name: form.name?.trim() || form.nameEnglish?.trim() || form.nameAmharic?.trim() || 'Untitled Rule',
+        description: form.description?.trim() || form.descriptionEnglish?.trim() || '',
+      };
+
+      console.log('📤 Saving rule:', {
+        name: data.name,
+        method: data.method,
+        patternsCount: data.patterns?.length,
+        mixedRulesCount: data.mixedRules?.length,
+      });
+
       if (editingRule) {
-        await axios.put(API + '/main-bingo-rules/' + editingRule._id, form, { headers: headers() });
+        await axios.put(API + '/main-bingo-rules/' + editingRule._id, data, { headers: headers() });
         toast.success('Rule updated!');
       } else {
-        await axios.post(API + '/main-bingo-rules', form, { headers: headers() });
+        await axios.post(API + '/main-bingo-rules', data, { headers: headers() });
         toast.success('Rule created!');
       }
       setShowModal(false);
       fetchRules();
-    } catch (e) { toast.error(e.response?.data?.error || 'Save failed'); }
+    } catch (e) { 
+      console.error('Save error:', e.response?.data);
+      toast.error(e.response?.data?.error || 'Save failed'); 
+    }
   };
 
   const deleteRule = async (id) => {
@@ -163,10 +200,6 @@ export default function MainBingoRulesPage() {
         <button onClick={openCreate} style={{ padding: '12px 28px', background: 'linear-gradient(135deg, #d4af37, #b8962f)', color: '#fff', border: '2px solid #000', borderRadius: 10, cursor: 'pointer', fontWeight: 700, fontSize: 14 }}>+ Create New Rule</button>
       </div>
 
-      <div style={{ background: '#fff', border: '2px solid #000', borderRadius: 14, padding: 20, marginBottom: 24 }}>
-        <ScheduledGames />
-      </div>
-
       {rules.length === 0 && (
         <div style={{ textAlign: 'center', padding: 60, background: '#fff', border: '2px solid #000', borderRadius: 14 }}>
           <p style={{ fontSize: 48 }}>🎱</p>
@@ -180,9 +213,36 @@ export default function MainBingoRulesPage() {
         ))}
       </div>
 
-      {showModal && <RuleForm editingRule={editingRule} form={form} onChange={setForm} onSave={saveRule} onClose={() => setShowModal(false)} />}
-      {testRule && <TestModal rule={testRule} testCells={testCells} testResult={testResult} onCellClick={toggleTestCell} onTest={runTest} onSaveSample={saveAsSample} onClose={() => setTestRule(null)} />}
-      {showSamples && viewRule && <SamplesModal rule={viewRule} samples={samples} onClose={() => setShowSamples(false)} onDeleteSample={deleteSample} />}
+      {showModal && (
+        <RuleForm 
+          editingRule={editingRule} 
+          form={form} 
+          onChange={setForm} 
+          onSave={saveRule} 
+          onClose={() => setShowModal(false)} 
+        />
+      )}
+      
+      {testRule && (
+        <TestModal 
+          rule={testRule} 
+          testCells={testCells} 
+          testResult={testResult} 
+          onCellClick={toggleTestCell} 
+          onTest={runTest} 
+          onSaveSample={saveAsSample} 
+          onClose={() => setTestRule(null)} 
+        />
+      )}
+      
+      {showSamples && viewRule && (
+        <SamplesModal 
+          rule={viewRule} 
+          samples={samples} 
+          onClose={() => setShowSamples(false)} 
+          onDeleteSample={deleteSample} 
+        />
+      )}
     </div>
   );
 }

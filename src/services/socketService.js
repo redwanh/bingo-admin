@@ -8,7 +8,6 @@ class SocketService {
     this.listeners = new Map();
   }
 
-  // Connect with auth token
   connect(token) {
     if (this.socket?.connected) return;
 
@@ -22,6 +21,8 @@ class SocketService {
 
     this.socket.on('connect', () => {
       console.log('🔌 Socket connected:', this.socket.id);
+      // Join main bingo room
+      this.emit('joinRoom', 'main-bingo-room');
     });
 
     this.socket.on('disconnect', (reason) => {
@@ -32,11 +33,10 @@ class SocketService {
       console.error('Socket error:', error.message);
     });
 
-    // Listen for game events
+    // Listen for ALL game events with CORRECT names
     this.setupGameListeners();
   }
 
-  // Disconnect
   disconnect() {
     if (this.socket) {
       this.socket.disconnect();
@@ -44,59 +44,82 @@ class SocketService {
     }
   }
 
+  emit(event, data) {
+    if (this.socket) {
+      this.socket.emit(event, data);
+    }
+  }
+
   // ============================================
-  // GAME EVENT LISTENERS
+  // GAME EVENT LISTENERS (CORRECTED NAMES)
   // ============================================
   setupGameListeners() {
-    // Admin started a new game
-    this.socket.on('mainBingoGameStarted', (data) => {
-      console.log('📡 New game starting:', data);
-      this.notifyListeners('gameStarted', data);
+    // Initial state on join
+    this.socket.on('gameState', (data) => {
+      console.log('📡 gameState:', data?.active ? data.game?.status : 'no game');
+      this.notifyListeners('gameState', data);
     });
 
-    // Game countdown started
+    // Admin created new game
+    this.socket.on('mainBingoSetup', (data) => {
+      console.log('📡 New game setup:', data);
+      this.notifyListeners('gameSetup', data);
+    });
+
+    // Countdown started
     this.socket.on('mainBingoCountdown', (data) => {
       console.log('⏳ Countdown:', data);
       this.notifyListeners('countdown', data);
     });
 
-    // Game is now live (drawing numbers)
-    this.socket.on('mainBingoLive', (data) => {
-      console.log('🎮 Game is live:', data);
-      this.notifyListeners('gameLive', data);
+    // Game is live
+    this.socket.on('mainBingoStarted', (data) => {
+      console.log('🎮 Game started:', data);
+      this.notifyListeners('gameStarted', data);
     });
 
-    // New number drawn
+    // Number drawn
     this.socket.on('mainBingoNumberDrawn', (data) => {
       this.notifyListeners('numberDrawn', data);
     });
 
-    // Someone called BINGO
+    // Prize set
+    this.socket.on('mainBingoPrizeSet', (data) => {
+      console.log('💰 Prize set:', data);
+      this.notifyListeners('prizeUpdated', data);
+    });
+
+    // First BINGO
     this.socket.on('mainBingoFirstBingo', (data) => {
       console.log('🎉 First BINGO:', data);
       this.notifyListeners('firstBingo', data);
     });
 
+    // Additional BINGO
     this.socket.on('mainBingoAdditionalBingo', (data) => {
       console.log('🎉 Additional BINGO:', data);
       this.notifyListeners('additionalBingo', data);
     });
 
+    // Grace period
+    this.socket.on('mainBingoGracePeriod', (data) => {
+      this.notifyListeners('gracePeriod', data);
+    });
+
     // Game ended
-    this.socket.on('mainBingoGameEnded', (data) => {
+    this.socket.on('mainBingoEnded', (data) => {
       console.log('🏁 Game ended:', data);
       this.notifyListeners('gameEnded', data);
     });
 
-    // Prize updated
-    this.socket.on('mainBingoPrizeUpdated', (data) => {
-      console.log('💰 Prize updated:', data);
-      this.notifyListeners('prizeUpdated', data);
+    // False BINGO
+    this.socket.on('mainBingoFalseBingo', (data) => {
+      this.notifyListeners('falseBingo', data);
     });
 
-    // Grace period
-    this.socket.on('mainBingoGracePeriod', (data) => {
-      this.notifyListeners('gracePeriod', data);
+    // Cards updated
+    this.socket.on('cardsUpdated', (data) => {
+      this.notifyListeners('cardsUpdated', data);
     });
   }
 
@@ -125,6 +148,5 @@ class SocketService {
   }
 }
 
-// Singleton instance
 const socketService = new SocketService();
 export default socketService;
