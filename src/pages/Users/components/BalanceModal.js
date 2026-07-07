@@ -1,93 +1,40 @@
 ﻿import React, { useState } from "react";
-import axios from "axios";
 import toast from "react-hot-toast";
-import "./BalanceModal.css";
+import "../../Users/UsersNew.css";
 
-const API = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
-
-export default function BalanceModal({ user, onClose, onSuccess }) {
+export default function BalanceModal({ user, onClose, onSubmit, onSuccess }) {
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
+  const name = user?.fullName || "User";
+  const balance = user?.walletBalance ?? user?.balance ?? 0;
+  const newBalance = balance + parseFloat(amount || 0);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    const numAmount = parseFloat(amount);
-
-    if (!amount || isNaN(numAmount) || numAmount <= 0) {
-      toast.error("Please enter a valid amount");
-      return;
-    }
-
+    const amt = parseFloat(amount);
+    if (!amt || amt <= 0) return toast.error("Enter valid amount");
+    if (amt > 100000) return toast.error("Max 100,000");
     setLoading(true);
-    try {
-      const token = localStorage.getItem("token");
-      await axios.post(
-        `${API}/admin/users/${user._id}/balance`,
-        { amount: numAmount },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      toast.success(`Added $${numAmount.toFixed(2)} to ${user.fullName || "user"}`);
-      onSuccess();
-      onClose();
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to add balance");
-    } finally {
-      setLoading(false);
-    }
+    const ok = await onSubmit(user._id, amt, name);
+    setLoading(false);
+    if (ok) onSuccess();
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2 className="modal-title">💰 Add Balance</h2>
-          <button className="modal-close" onClick={onClose}>✕</button>
-        </div>
-
-        <div className="modal-body">
-          <p className="modal-user">
-            User: <strong>{user.fullName || "Unknown"}</strong>
-          </p>
-          <p className="modal-current">
-            Current Balance: <strong>${(user.balance || 0).toFixed(2)}</strong>
-          </p>
-
-          <form onSubmit={handleSubmit} className="modal-form">
-            <div className="form-group">
-              <label className="form-label">Amount ($)</label>
-              <input
-                className="form-input"
-                type="number"
-                step="0.01"
-                min="0.01"
-                placeholder="Enter amount..."
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                autoFocus
-                disabled={loading}
-              />
-            </div>
-
-            <div className="modal-actions">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={onClose}
-                disabled={loading}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={loading}
-              >
-                {loading ? "Adding..." : "Add Balance"}
-              </button>
-            </div>
-          </form>
-        </div>
+    <div className="um-modal-overlay" onClick={onClose}><div className="um-modal" onClick={e=>e.stopPropagation()}>
+      <div className="um-modal-header"><h2 className="um-modal-title">💰 Add Balance</h2><button className="um-modal-close" onClick={onClose}>✕</button></div>
+      <div className="um-modal-body">
+        <div className="um-modal-user"><div className="um-modal-avatar">{name[0].toUpperCase()}</div><div><p className="um-modal-user-name">{name}</p><p className="um-modal-user-balance">Current: <strong>{balance.toLocaleString()}</strong></p></div></div>
+        <form onSubmit={handleSubmit}>
+          <label className="um-form-label">Amount</label>
+          <input className="um-form-input" type="number" step="0.01" min="1" max="100000" placeholder="Enter amount..." value={amount} onChange={e=>setAmount(e.target.value)} disabled={loading} autoFocus />
+          {amount>0 && <p className="um-balance-preview">New balance: <strong>{newBalance.toLocaleString()}</strong></p>}
+          <div className="um-modal-actions">
+            <button type="button" className="um-btn um-btn-ghost" onClick={onClose} disabled={loading}>Cancel</button>
+            <button type="submit" className="um-btn um-btn-primary" disabled={loading||!amount}>{loading?"Processing...":"Confirm"}</button>
+          </div>
+        </form>
       </div>
-    </div>
+    </div></div>
   );
 }

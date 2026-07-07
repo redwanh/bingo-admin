@@ -1,71 +1,25 @@
 ﻿import React from "react";
-import "./Pagination.css";
+import "../../Users/UsersNew.css";
 
 export default function Pagination({ page, totalPages, onPageChange }) {
   if (totalPages <= 1) return null;
-
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxVisible = 5;
-    
-    if (totalPages <= maxVisible) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      pages.push(1);
-      
-      let start = Math.max(2, page - 1);
-      let end = Math.min(totalPages - 1, page + 1);
-      
-      if (page <= 2) end = maxVisible - 1;
-      if (page >= totalPages - 1) start = totalPages - (maxVisible - 2);
-      
-      if (start > 2) pages.push("...");
-      
-      for (let i = start; i <= end; i++) {
-        if (i !== 1 && i !== totalPages) {
-          pages.push(i);
-        }
-      }
-      
-      if (end < totalPages - 1) pages.push("...");
-      if (totalPages > 1) pages.push(totalPages);
-    }
-    
-    return pages;
-  };
-
+  const pages = [];
+  if (totalPages <= 5) for (let i = 1; i <= totalPages; i++) pages.push(i);
+  else {
+    pages.push(1);
+    let s = Math.max(2, page - 1), e = Math.min(totalPages - 1, page + 1);
+    if (page <= 2) e = 4;
+    if (page >= totalPages - 1) s = totalPages - 3;
+    if (s > 2) pages.push("...");
+    for (let i = s; i <= e; i++) pages.push(i);
+    if (e < totalPages - 1) pages.push("...");
+    pages.push(totalPages);
+  }
   return (
-    <div className="pagination-container">
-      <button
-        className="pagination-btn"
-        disabled={page <= 1}
-        onClick={() => onPageChange(page - 1)}
-      >
-        ← Previous
-      </button>
-
-      <div className="pagination-pages">
-        {getPageNumbers().map((p, index) => (
-          <button
-            key={index}
-            className={`page-btn ${p === page ? "active" : ""} ${p === "..." ? "dots" : ""}`}
-            onClick={() => p !== "..." && onPageChange(p)}
-            disabled={p === "..."}
-          >
-            {p}
-          </button>
-        ))}
-      </div>
-
-      <button
-        className="pagination-btn"
-        disabled={page >= totalPages}
-        onClick={() => onPageChange(page + 1)}
-      >
-        Next →
-      </button>
+    <div className="um-pagination">
+      <button className="um-page-btn" disabled={page<=1} onClick={()=>onPageChange(page-1)}>← Prev</button>
+      <div className="um-pagination-pages">{pages.map((p,i)=>p==="..."?<span key={i} className="um-page-num um-page-dots">...</span>:<button key={i} className={`um-page-num ${p===page?"um-page-active":""}`} onClick={()=>onPageChange(p)}>{p}</button>)}</div>
+      <button className="um-page-btn" disabled={page>=totalPages} onClick={()=>onPageChange(page+1)}>Next →</button>
     </div>
   );
 }

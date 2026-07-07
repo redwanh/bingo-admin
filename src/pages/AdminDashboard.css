@@ -1,0 +1,24 @@
+.admin-dashboard {
+  padding: 20px;
+}
+
+.dashboard-welcome {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.dashboard-welcome h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+.dashboard-welcome p {
+  font-size: 16px;
+  color: #64748b;
+  margin: 0;
+}

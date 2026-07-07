@@ -1,44 +1,58 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useUsers } from './hooks/useUsers';
 import UserToolbar from './components/UserToolbar';
 import UserTable from './components/UserTable';
 import BalanceModal from './components/BalanceModal';
 import Pagination from './components/Pagination';
-import './Users.css';
+import './UsersNew.css';
 
 export default function Users() {
   const { user: authUser } = useAuth();
   const [selectedUser, setSelectedUser] = useState(null);
 
   const {
-    users, search, page, totalPages, totalUsers, loading,
-    roleFilter, statusFilter, sortBy,
-    setPage, handleSearch, setRoleFilter, setStatusFilter, setSortBy,
-    toggleStatus, fetchUsers,
+    users,
+    search,
+    page,
+    totalPages,
+    totalUsers,
+    loading,
+    roleFilter,
+    statusFilter,
+    sortBy,
+    setPage,
+    handleSearch,
+    setRoleFilter,
+    setStatusFilter,
+    setSortBy,
+    toggleStatus,
+    addBalance,
+    fetchUsers,
   } = useUsers();
 
+  const canManageUsers = ['admin', 'superadmin'].includes(authUser?.role);
+
+  const handleAddBalance = useCallback((user) => setSelectedUser(user), []);
+  const handleBalanceSuccess = useCallback(() => { setSelectedUser(null); fetchUsers(); }, [fetchUsers]);
+  const handleCloseModal = useCallback(() => setSelectedUser(null), []);
+
   return (
-    <div className="users-container">
-      {/* Header */}
-      <div className="users-header">
-        <div className="users-title-group">
-          <h1 className="users-title">👥 User Management</h1>
-          <span className="users-subtitle">Manage and monitor all platform users</span>
+    <div className="um-container">
+      <div className="um-header">
+        <div>
+          <h1 className="um-title">User Management</h1>
+          <span className="um-subtitle">Total {totalUsers} registered user{totalUsers !== 1 ? 's' : ''}</span>
         </div>
-        <div className="users-stats">
-          <div className="users-stat-badge">
-            <span className="stat-number">{totalUsers}</span>
-            <span className="stat-label">Total Users</span>
-          </div>
+        <div className="um-stat-badge">
+          <span className="um-stat-number">{totalUsers}</span>
+          <span className="um-stat-label">Total Users</span>
         </div>
       </div>
 
-      {/* Toolbar */}
       <UserToolbar
         search={search}
         onSearch={handleSearch}
-        totalUsers={totalUsers}
         roleFilter={roleFilter}
         onRoleFilter={setRoleFilter}
         statusFilter={statusFilter}
@@ -47,24 +61,22 @@ export default function Users() {
         onSortBy={setSortBy}
       />
 
-      {/* Table */}
       <UserTable
         users={users}
         loading={loading}
         onToggle={toggleStatus}
-        onAddBalance={setSelectedUser}
-        userRole={authUser?.role}
+        onAddBalance={handleAddBalance}
+        canManage={canManageUsers}
       />
 
-      {/* Pagination */}
       <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
 
-      {/* Modal */}
       {selectedUser && (
         <BalanceModal
           user={selectedUser}
-          onClose={() => setSelectedUser(null)}
-          onSuccess={fetchUsers}
+          onClose={handleCloseModal}
+          onSubmit={addBalance}
+          onSuccess={handleBalanceSuccess}
         />
       )}
     </div>

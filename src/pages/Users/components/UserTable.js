@@ -1,91 +1,33 @@
-﻿import React from "react";
-import "./UserTable.css";
+﻿import React, { memo } from "react";
+import "../../Users/UsersNew.css";
 
-export default function UserTable({ users, loading, onToggle, onAddBalance, userRole }) {
-  if (loading) {
-    return (
-      <div className="table-loading">
-        <div className="loading-spinner-small"></div>
-        <span>Loading users...</span>
-      </div>
-    );
-  }
-
-  if (!users || users.length === 0) {
-    return (
-      <div className="table-empty">
-        <span className="empty-icon">📭</span>
-        <p className="empty-text">No users found</p>
-        <p className="empty-subtext">Try adjusting your search or filters</p>
-      </div>
-    );
-  }
-
-  const isAdmin = userRole === "superadmin" || userRole === "admin";
+const UserRow = memo(({ user, onToggle, onAddBalance, canManage }) => {
+  const isActive = user.isActive !== false;
+  const name = user.fullName || user.username || "Unknown";
+  const balance = user.walletBalance ?? user.balance ?? 0;
+  
 
   return (
-    <div className="table-container">
-      <div className="table-scroll">
-        <table className="user-table">
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Phone</th>
-              <th>Role</th>
-              <th>Balance</th>
-              <th>Status</th>
-              {isAdmin && <th className="actions-col">Actions</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user._id}>
-                <td>
-                  <div className="user-cell">
-                    <div className="user-avatar-small">
-                      {(user.fullName || "U")[0].toUpperCase()}
-                    </div>
-                    <div>
-                      <div className="user-name">{user.fullName || "Unknown"}</div>
-                      <div className="user-email">{user.email || user.username || ""}</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="phone-cell">{user.phone || "—"}</td>
-                <td>
-                  <span className={`role-badge role-${user.role || "user"}`}>
-                    {user.role || "user"}
-                  </span>
-                </td>
-                <td className="balance-cell">
-                  <span className="balance-amount">
-                    ${(user.balance || 0).toFixed(2)}
-                  </span>
-                </td>
-                <td>
-                  <button
-                    className={`status-toggle ${user.isActive !== false ? "active" : "inactive"}`}
-                    onClick={() => onToggle(user._id)}
-                    disabled={!isAdmin}
-                  >
-                    {user.isActive !== false ? "Active" : "Inactive"}
-                  </button>
-                </td>
-                {isAdmin && (
-                  <td className="actions-col">
-                    <button
-                      className="action-btn add-balance"
-                      onClick={() => onAddBalance(user)}
-                    >
-                      💰 Add Balance
-                    </button>
-                  </td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <tr className={`um-table-row ${!isActive ? "um-table-row--inactive" : ""}`}>
+      <td><div className="um-user-cell"><div className="um-avatar">{name[0].toUpperCase()}</div><div className="um-user-info"><span className="um-user-name">{name}</span>{user.email && <span className="um-user-email">{user.email}</span>}</div></div></td>
+      <td>{user.phone || "—"}</td>
+      <td><span className={`um-role-badge um-role-${user.role||"user"}`}>{user.role||"user"}</span></td>
+      <td className="um-balance-cell">{Number(balance).toLocaleString(undefined,{minimumFractionDigits:2})}</td>
+      <td><span className={`um-status-badge ${isActive?"um-status-active":"um-status-inactive"}`}><span className="um-status-dot"/>{isActive?"Active":"Inactive"}</span></td>
+      {canManage && <td className="um-actions-col">
+        <button className="um-action-btn um-action-toggle" onClick={()=>onToggle(user._id,isActive,name)}>{isActive?"🔒 Disable":"✅ Enable"}</button>
+        <button className="um-action-btn um-action-balance" onClick={()=>onAddBalance(user)}>💰 Balance</button>
+      </td>}
+    </tr>
+  );
+});
+UserRow.displayName="UserRow";
+
+function UserTable({ users, loading, onToggle, onAddBalance, canManage }) {
+  if (loading) return <div className="um-table-state"><div className="um-spinner"/><span>Loading...</span></div>;
+  if (!users?.length) return <div className="um-table-state um-table-empty"><span className="um-empty-icon">📭</span><p>No users found</p><span>Try adjusting your filters</span></div>;
+  return (
+    <div className="um-table-wrap"><div className="um-table-scroll"><table className="um-table"><thead><tr><th>User</th><th>Phone</th><th>Role</th><th>Balance</th><th>Status</th>{canManage&&<th className="um-actions-col">Actions</th>}</tr></thead><tbody>{users.map(u=><UserRow key={u._id} user={u} onToggle={onToggle} onAddBalance={onAddBalance} canManage={canManage}/>)}</tbody></table></div></div>
   );
 }
+export default memo(UserTable);

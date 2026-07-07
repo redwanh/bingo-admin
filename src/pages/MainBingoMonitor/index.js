@@ -252,6 +252,15 @@ export default function MainBingoMonitor() {
                   <div className="form-group form-group-sm"><label className="form-label">Call Interval (s)</label><input type="number" value={form.callIntervalSeconds} onChange={e=>setForm({...form,callIntervalSeconds:parseInt(e.target.value)||5})} className="form-input" /></div>
                   <div className="form-group form-group-sm"><label className="form-label">Countdown (s)</label><input type="number" value={form.gameStartingSeconds} onChange={e=>setForm({...form,gameStartingSeconds:parseInt(e.target.value)||30})} className="form-input" /></div>
                   <div className="form-group form-group-sm"><label className="form-label">Grace Period (s)</label><input type="number" value={form.gracePeriodSeconds} onChange={e=>setForm({...form,gracePeriodSeconds:parseInt(e.target.value)||10})} className="form-input" /></div>
+                  <div className="form-group form-group-sm">
+  <label className="form-label">Last Number = BINGO</label>
+  <input 
+    type="checkbox" 
+    checked={form.isLastNumberCalledBingo} 
+    onChange={e => setForm({...form, isLastNumberCalledBingo: e.target.checked})} 
+    style={{ width: 20, height: 20, marginTop: 4 }}
+  />
+</div>
                 </div></div>}
                 
                 <button className={`collapse-trigger ${showRules?'open':''}`} onClick={()=>setShowRules(!showRules)}><span>🎯 Game Rules</span><span>{showRules?'▲':'▼'}</span></button>

@@ -1,0 +1,368 @@
+/* ==========================================
+   ACCOUNT MANAGEMENT – White, Gold, Black
+   ========================================== */
+
+:root {
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --text: #1a1a1a;
+  --text-muted: #888;
+  --border: #000;
+  --gold: #d4af37;
+  --gold-light: #fef9e7;
+  --radius: 8px;
+  --shadow: 2px 2px 0 #000;
+  --transition: all 0.15s ease;
+}
+
+/* ── Container ── */
+.acc-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: #fafafa;
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+.acc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.acc-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin: 0;
+}
+.acc-subtitle {
+  font-size: 13px;
+  color: #888;
+  margin: 4px 0 0;
+}
+.acc-header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* ── Buttons ── */
+.acc-btn {
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0 #000;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+.acc-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #000;
+}
+.acc-btn-primary {
+  background: #d4af37;
+  color: #1a1a1a;
+}
+.acc-btn-outline {
+  background: #fff;
+  color: #8b6914;
+  border-color: #d4af37;
+}
+.acc-btn-outline:hover {
+  background: #fef9e7;
+}
+.acc-btn-ghost {
+  background: #fff;
+  color: #1a1a1a;
+}
+
+/* ── Loading ── */
+.acc-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  gap: 12px;
+  color: #888;
+}
+.acc-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #eee;
+  border-top: 3px solid #d4af37;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Empty ── */
+.acc-empty {
+  text-align: center;
+  padding: 60px 20px;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 12px;
+  box-shadow: 2px 2px 0 #000;
+}
+.acc-empty-icon {
+  font-size: 48px;
+}
+.acc-empty-title {
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 12px 0 4px;
+}
+.acc-empty-text {
+  color: #888;
+  font-size: 13px;
+}
+
+/* ── Grid ── */
+.acc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 16px;
+}
+
+/* ── Card ── */
+.acc-card {
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 2px 2px 0 #000;
+  transition: all 0.2s ease;
+}
+.acc-card:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #000;
+}
+.acc-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+.acc-type-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: 2px solid #000;
+  margin-bottom: 8px;
+}
+.acc-type-badge.telebirr {
+  background: #eff6ff;
+  color: #1e40af;
+}
+.acc-type-badge.cbe {
+  background: #f0fdf4;
+  color: #166534;
+}
+.acc-card-name {
+  font-weight: 700;
+  font-size: 16px;
+  color: #1a1a1a;
+  margin: 0;
+}
+.acc-card-actions {
+  display: flex;
+  gap: 6px;
+}
+.acc-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 2px solid #000;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 1px 1px 0 #000;
+  transition: all 0.15s ease;
+}
+.acc-icon-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0 #000;
+}
+.acc-edit-btn:hover {
+  background: #fef9e7;
+}
+.acc-delete-btn:hover {
+  background: #fee2e2;
+}
+
+/* ── Card Details ── */
+.acc-card-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.acc-detail-item {
+  background: #fafafa;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+.acc-detail-full {
+  grid-column: 1 / -1;
+}
+.acc-detail-label {
+  font-size: 10px;
+  color: #888;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+  display: block;
+}
+.acc-detail-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+.acc-detail-value.mono {
+  font-family: monospace;
+}
+.acc-detail-text {
+  font-size: 12px;
+  color: #555;
+  line-height: 1.4;
+}
+
+/* ── Modal ── */
+.acc-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  backdrop-filter: blur(3px);
+}
+.acc-modal {
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 5px 5px 0 #000;
+}
+.acc-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #eee;
+}
+.acc-modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+.acc-modal-close {
+  width: 30px;
+  height: 30px;
+  border: 2px solid #000;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.acc-form {
+  padding: 24px;
+}
+.acc-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.acc-form-group {
+  margin-bottom: 12px;
+}
+.acc-form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 4px;
+}
+.acc-form-input,
+.acc-form-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid #000;
+  border-radius: 6px;
+  font-size: 13px;
+  background: #fafafa;
+  color: #1a1a1a;
+  outline: none;
+  font-family: inherit;
+}
+.acc-form-input:focus,
+.acc-form-textarea:focus {
+  border-color: #d4af37;
+}
+.acc-form-textarea {
+  resize: vertical;
+}
+.acc-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .acc-container {
+    padding: 12px;
+  }
+  .acc-header {
+    flex-direction: column;
+  }
+  .acc-grid {
+    grid-template-columns: 1fr;
+  }
+  .acc-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+.acc-type-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.acc-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  /* ... rest of your styles */
+}

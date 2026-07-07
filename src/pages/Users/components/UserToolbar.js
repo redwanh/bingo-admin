@@ -1,84 +1,34 @@
-﻿import React from 'react';
-import './UserToolbar.css';
+﻿import React, { useEffect, useRef, useState } from "react";
+import "../../Users/UsersNew.css";
 
-export default function UserToolbar({
-  search,
-  onSearch,
-  totalUsers,
-  roleFilter,
-  onRoleFilter,
-  statusFilter,
-  onStatusFilter,
-  sortBy,
-  onSortBy,
-}) {
-  const roles = ['all', 'user', 'admin', 'superadmin'];
-  const statuses = ['all', 'active', 'inactive'];
+export default function UserToolbar({ search, onSearch, roleFilter, onRoleFilter, statusFilter, onStatusFilter, sortBy, onSortBy }) {
+  const toolbarRef = useRef(null);
+  const [isSticky, setIsSticky] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => { if (toolbarRef.current) setIsSticky(toolbarRef.current.getBoundingClientRect().top <= 8); };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <div className="toolbar-container">
-      {/* Search */}
-      <div className="toolbar-search">
-        <span className="search-icon">🔍</span>
-        <input
-          className="search-input"
-          type="text"
-          placeholder="Search by name, phone, or email..."
-          value={search}
-          onChange={(e) => onSearch(e.target.value)}
-        />
-        {search && (
-          <button className="search-clear" onClick={() => onSearch('')}>
-            ✕
-          </button>
-        )}
+    <div ref={toolbarRef} className={`um-toolbar ${isSticky ? "is-sticky" : ""}`}>
+      <div className="um-search-wrap">
+        <span className="um-search-icon">🔍</span>
+        <input className="um-search-input" type="text" placeholder="Search..." value={search} onChange={e => onSearch(e.target.value)} />
+        {search && <button className="um-search-clear" onClick={() => onSearch("")}>✕</button>}
       </div>
-
-      {/* Filters */}
-      <div className="toolbar-filters">
-        <div className="filter-group">
-          <label className="filter-label">Role</label>
-          <select
-            className="filter-select"
-            value={roleFilter}
-            onChange={(e) => onRoleFilter(e.target.value)}
-          >
-            {roles.map((role) => (
-              <option key={role} value={role}>
-                {role.charAt(0).toUpperCase() + role.slice(1)}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="filter-group">
-          <label className="filter-label">Status</label>
-          <select
-            className="filter-select"
-            value={statusFilter}
-            onChange={(e) => onStatusFilter(e.target.value)}
-          >
-            {statuses.map((status) => (
-              <option key={status} value={status}>
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="filter-group">
-          <label className="filter-label">Sort</label>
-          <select
-            className="filter-select"
-            value={sortBy}
-            onChange={(e) => onSortBy(e.target.value)}
-          >
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
-            <option value="name">Name A-Z</option>
-            <option value="role">Role</option>
-          </select>
-        </div>
+      <div className="um-filters">
+        {[{ label: "Role", value: roleFilter, onChange: onRoleFilter, options: ["all","user","admin","superadmin"] },
+          { label: "Status", value: statusFilter, onChange: onStatusFilter, options: ["all","active","inactive"] },
+          { label: "Sort", value: sortBy, onChange: onSortBy, options: ["newest","oldest","name","role"] }].map(f => (
+          <div className="um-filter-group" key={f.label}>
+            <label className="um-filter-label">{f.label}</label>
+            <select className="um-filter-select" value={f.value} onChange={e => f.onChange(e.target.value)}>
+              {f.options.map(o => <option key={o} value={o}>{o[0].toUpperCase()+o.slice(1)}</option>)}
+            </select>
+          </div>
+        ))}
       </div>
     </div>
   );
