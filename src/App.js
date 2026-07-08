@@ -1,4 +1,4 @@
-import React, { lazy } from 'react';  // ← ADD lazy import
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
@@ -11,15 +11,12 @@ import Dashboard from './pages/Dashboard';
 import Users from './pages/Users/index';
 import GameConfig from './pages/GameConfig';
 import VoiceManager from './pages/VoiceManager';
-import GameMonitor from './pages/MainBingoMonitor';
 import MainBingoRules from './pages/MainBingoRules';
 import MainBingoMonitor from './pages/MainBingoMonitor';
 import Transactions from './pages/Transactions/index';
 import CMS from './pages/CMS';
 import AppSettings from './pages/AppSettings/index';
-
-// 🔥 FIXED: lazy import with correct casing
-const AccountManagement = lazy(() => import('./pages/AccountManagement'));
+import AccountManagement from './pages/AccountManagement'; // ← Direct import
 
 function App() {
   return (
@@ -63,7 +60,7 @@ function App() {
           } />
           <Route path="/game-monitor" element={
             <ProtectedRoute>
-              <AdminLayout><GameMonitor /></AdminLayout>
+              <AdminLayout><MainBingoMonitor /></AdminLayout>
             </ProtectedRoute>
           } />
           <Route path="/transactions" element={
@@ -71,14 +68,11 @@ function App() {
               <AdminLayout><Transactions /></AdminLayout>
             </ProtectedRoute>
           } />
-          
-          {/* 🔥 FIXED: Proper path casing and component name */}
           <Route path="/account-management" element={
             <ProtectedRoute>
               <AdminLayout><AccountManagement /></AdminLayout>
             </ProtectedRoute>
           } />
-          
           <Route path="/cms" element={
             <ProtectedRoute>
               <AdminLayout><CMS /></AdminLayout>

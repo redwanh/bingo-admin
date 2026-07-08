@@ -2,8 +2,10 @@
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { io } from 'socket.io-client';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const SOCKET_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 export default function GameConfig() {
   const { user } = useAuth();
@@ -30,23 +32,74 @@ export default function GameConfig() {
     setLoading(false);
   };
 
-
-
-
-
-  
-
   useEffect(() => {
     if (activeTab === 'history') fetchHistory(1);
     if (activeTab === 'current') fetchCurrentGame();
   }, [activeTab]);
 
+  const fetchHistory = async (p) => {
+    setHistoryLoading(true);
+    try {
+      const headers = { Authorization: 'Bearer ' + localStorage.getItem('token') };
+      const res = await axios.get(API + `/game/history/fast_bingo?page=${p}&limit=${PER_PAGE}`, { headers });
+      setHistory(res.data || []);
+      setTotalPages(res.data?.pagination?.pages || 1);
+      setPage(p);
+    } catch { }
+    setHistoryLoading(false);
+  };
+
+  const fetchCurrentGame = async () => {
+    setCurrentLoading(true);
+    try {
+      const headers = { Authorization: 'Bearer ' + localStorage.getItem('token') };
+      const res = await axios.get(API + '/game/admin/active', { headers });
+      const fastGame = res.data?.find(g => g.roomId === 'fast_bingo');
+      setCurrentGame(fastGame || null);
+    } catch { }
+    setCurrentLoading(false);
+  };
+
+  // 🔥 SAVE + EMIT via Socket.IO
   const save = async () => {
     setSaving(true);
     try {
       const headers = { Authorization: 'Bearer ' + localStorage.getItem('token') };
       await axios.put(API + '/game/config/fast_bingo', config, { headers });
       toast.success('Configuration saved!');
+
+      // 🔥 Notify all players via socket
+      const socket = io(SOCKET_URL, {
+        auth: { token: localStorage.getItem('token') },
+        transports: ['websocket'],
+      });
+
+      socket.on('connect', () => {
+        socket.emit('configUpdated', {
+          roomId: 'fast_bingo',
+          config: {
+            cardPrice: config.cardPrice,
+            maxCardsPerPlayer: config.maxCardsPerPlayer,
+            minPlayersToStart: config.minPlayersToStart,
+            waitTimeSeconds: config.waitTimeSeconds,
+            drawIntervalSeconds: config.drawIntervalSeconds,
+            commissionPercentage: config.commissionPercentage,
+            gracePeriodSeconds: config.gracePeriodSeconds,
+            isActive: config.isActive,
+            autoBingoEnabled: config.autoBingoEnabled,
+            autoMarkDefault: config.autoMarkDefault,
+            voiceEnabled: config.voiceEnabled,
+          }
+        });
+        toast.success('Players notified! 📡');
+        socket.disconnect();
+      });
+
+      socket.on('connect_error', () => {
+        toast.success('Saved! (Players will see changes next refresh)');
+        socket.disconnect();
+      });
+
     } catch { toast.error('Failed to save'); }
     setSaving(false);
   };
@@ -122,8 +175,6 @@ export default function GameConfig() {
           <div><p style={styles.statLabel}>Prize Pool</p><p style={styles.statValue}>{game.prizePool || 0} ETB</p></div>
           <div><p style={styles.statLabel}>Winners</p><p style={styles.statValue}>{game.winners?.length || 0}</p></div>
         </div>
-
-        {/* Current game - show drawn numbers */}
         {game.status !== 'completed' && game.drawnNumbers && (
           <div style={{ marginBottom: 16 }}>
             <p style={{ fontWeight: 700, color: '#D4A017', marginBottom: 8, fontSize: 13 }}>🔢 Drawn Numbers ({game.drawnNumbers.length})</p>
@@ -134,15 +185,11 @@ export default function GameConfig() {
             </div>
           </div>
         )}
-
-        {/* Current game - show timer */}
         {game.status === 'waiting' && game.timerStartedAt && (
           <div style={{ marginBottom: 16, padding: 12, background: '#FFF8E1', borderRadius: 8, border: '1px solid #D4A017' }}>
             <p style={{ fontWeight: 700, color: '#D4A017', margin: 0, fontSize: 13 }}>⏱️ Timer: {game.timerDuration}s</p>
           </div>
         )}
-
-        {/* Winners */}
         {game.winners && game.winners.length > 0 && (
           <div>
             <p style={{ fontWeight: 700, color: '#D4A017', marginBottom: 10, fontSize: 13 }}>🏆 Winners</p>
@@ -162,11 +209,9 @@ export default function GameConfig() {
             ))}
           </div>
         )}
-
         {(!game.winners || game.winners.length === 0) && game.status === 'completed' && (
           <p style={{ color: '#888', fontSize: 13, fontStyle: 'italic' }}>No winners - all cards refunded</p>
         )}
-
         <div style={{ marginTop: 12, display: 'flex', gap: 20, fontSize: 11, color: '#888' }}>
           {game.startTime && <span>🕐 Started: {new Date(game.startTime).toLocaleString()}</span>}
           {game.endTime && <span>🏁 Ended: {new Date(game.endTime).toLocaleString()}</span>}
@@ -178,7 +223,7 @@ export default function GameConfig() {
   return (
     <div style={styles.container}>
       <h1 style={styles.header}>🎱 Fast Bingo Configuration</h1>
-      <p style={styles.subtitle}>Changes take effect on the next game.</p>
+      <p style={styles.subtitle}>Changes take effect on the next game. Players are notified instantly.</p>
 
       <div style={styles.tabs}>
         <button style={styles.tab(activeTab === 'config')} onClick={() => setActiveTab('config')}>⚙️ Configuration</button>
@@ -186,7 +231,6 @@ export default function GameConfig() {
         <button style={styles.tab(activeTab === 'history')} onClick={() => setActiveTab('history')}>📋 History</button>
       </div>
 
-      {/* Config Tab */}
       {activeTab === 'config' && (
         <>
           <div style={styles.grid}>
@@ -218,7 +262,6 @@ export default function GameConfig() {
         </>
       )}
 
-      {/* Current Game Tab */}
       {activeTab === 'current' && (
         <div>
           {currentLoading ? (
@@ -231,7 +274,6 @@ export default function GameConfig() {
         </div>
       )}
 
-      {/* History Tab */}
       {activeTab === 'history' && (
         <div>
           {historyLoading ? (
@@ -245,7 +287,6 @@ export default function GameConfig() {
                   <GameCard key={game._id} game={game} />
                 ))}
               </div>
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div style={styles.pagination}>
                   <button style={styles.pageBtn(false)} onClick={() => fetchHistory(page - 1)} disabled={page === 1}>← Prev</button>

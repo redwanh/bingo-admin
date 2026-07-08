@@ -166,7 +166,7 @@ export function useMainBingo(token, user) {
     // 📡 Card purchase error
     const onCardPurchaseError = (data) => {
       console.error('❌ Card purchase error:', data.message);
-      alert(data.message);
+ 
     };
 
     // 📡 Connection error
