@@ -26,7 +26,7 @@ export default function GameConfig() {
   const fetchConfig = async () => {
     try {
       const headers = { Authorization: 'Bearer ' + localStorage.getItem('token') };
-      const res = await axios.get(API + '/game/config/fast_bingo', { headers });
+      const res = await axios.get(API + '/fb/admin/config', { headers });
       if (res.data && res.data.roomId) setConfig(res.data);
     } catch { }
     setLoading(false);
